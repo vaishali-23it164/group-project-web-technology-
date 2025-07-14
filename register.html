@@ -19,9 +19,11 @@
       justify-content: space-between;
       padding: 4rem 10%;
       align-items: center;
+      flex-wrap: wrap;
     }
     .left {
       flex: 1;
+      min-width: 300px;
       padding-right: 4rem;
     }
     .left h2 {
@@ -50,10 +52,15 @@
     select, input {
       width: 100%;
       padding: 0.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
+    }
+    small {
+      color: red;
+      display: none;
+      margin-bottom: 0.5rem;
     }
     button {
       width: 100%;
@@ -94,11 +101,6 @@
       color: #888;
       border-top: 1px solid #eee;
     }
-    @media (max-width: 900px) {
-      .container { flex-direction: column; align-items: flex-start; padding: 2rem; }
-      .left, .right { max-width: 100%; padding: 0; }
-      .left { margin-bottom: 2rem; }
-    }
   </style>
 </head>
 <body>
@@ -107,22 +109,29 @@
   <div class="container">
     <div class="left">
       <h2>Create Your HireSight Account</h2>
-      <p>Sign up to access your dashboard, build stunning resumes, and land interviews faster. It only takes a minute to get started!</p>
+      <p>Sign up to access your dashboard, build stunning resumes, and land interviews faster.</p>
     </div>
     <div class="right">
       <h2>Register</h2>
-      <form>
-        <select required>
-          <option value="">User Type</option>
-          <option value="applicant">Applicant</option>
-          <option value="hr">HR</option>
+      <form id="registerForm" novalidate>
+        <select id="userType" required>
+          <option value="">Select user type</option>
+          <option value="admin">Admin</option>
+          <option value="jobseeker">Job Seeker</option>
+<option value="hr">HR</option>
         </select>
-        <input type="text" placeholder="Full Name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <input type="password" placeholder="Confirm Password" required />
+
+        <input type="text" id="fullName" placeholder="Full Name" required />
+        <input type="email" id="email" placeholder="you@example.com" required />
+        <small id="emailError">Enter a valid email address</small>
+
+        <input type="password" id="password" placeholder="Create password" required />
+        <input type="password" id="confirmPassword" placeholder="Re-enter password" required />
+        <small id="passError">Passwords do not match or are too short.</small>
+
         <button type="submit">Register</button>
       </form>
+
       <div class="or">or continue with</div>
       <div class="socials">
         <button>Google</button>
@@ -132,5 +141,60 @@
   </div>
 
   <footer>© 2025 HireSight. All rights reserved.</footer>
+
+  <script>
+  const form = document.getElementById("registerForm");
+  const emailInput = document.getElementById("email");
+  const emailError = document.getElementById("emailError");
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const passError = document.getElementById("passError");
+
+  // ✅ Correct regex pattern for all emails including .edu
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  emailInput.addEventListener("input", () => {
+    emailError.style.display = emailPattern.test(emailInput.value) ? "none" : "block";
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const userType = document.getElementById("userType").value;
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    if (!emailPattern.test(email)) {
+      emailError.style.display = "block";
+      return;
+    }
+
+    if (password !== confirmPassword || password.length < 6) {
+      passError.style.display = "block";
+      return;
+    } else {
+      passError.style.display = "none";
+    }
+
+    if (!userType || !fullName || !email || !password || !confirmPassword) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
+    if (users.find(u => u.email === email)) {
+      alert("Email already registered.");
+      return;
+    }
+
+    users.push({ email, password });
+    localStorage.setItem("hiresight_users", JSON.stringify(users));
+    alert("✅ Registered successfully! Redirecting to login...");
+    window.location.href = "login.html";
+  });
+</script>
+
 </body>
 </html>

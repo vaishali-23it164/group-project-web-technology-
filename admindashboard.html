@@ -3,134 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register | HireSight</title>
+  <title>HireSight Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: #ffffff; }
-    header {
-      background: linear-gradient(90deg, #a087f9, #8661f2);
-      padding: 1.2rem 2rem;
-      color: white;
-      font-size: 1.4rem;
-      font-weight: bold;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0ff;
+      color: #333;
     }
-    .container {
+    .header {
+      background: #a490f0;
+      color: white;
       display: flex;
       justify-content: space-between;
-      padding: 4rem 10%;
-      align-items: center;
+      padding: 1rem 2rem;
     }
-    .left {
-      flex: 1;
-      padding-right: 4rem;
-    }
-    .left h2 {
-      font-size: 2rem;
-      color: #6f42c1;
-      margin-bottom: 1rem;
-    }
-    .left p {
-      color: #555;
-      font-size: 1rem;
-      max-width: 400px;
-    }
-    .right {
-      background: white;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-      flex: 1;
-      max-width: 400px;
-    }
-    .right h2 {
-      text-align: center;
-      color: #6f42c1;
-      margin-bottom: 1.5rem;
-    }
-    select, input {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      background: #00c3b8;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 1rem;
+    .logo {
       font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 1rem;
+      font-size: 1.5rem;
     }
-    .or {
-      text-align: center;
-      color: #666;
-      margin: 1rem 0;
+    .nav a {
+      margin-left: 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
     }
-    .socials {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-    .socials button {
-      flex: 1;
-      padding: 0.5rem;
-      background: #f5f5f5;
-      color: #333;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.9rem;
+    .dashboard {
       padding: 2rem;
-      color: #888;
-      border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
     }
-    @media (max-width: 900px) {
-      .container { flex-direction: column; align-items: flex-start; padding: 2rem; }
-      .left, .right { max-width: 100%; padding: 0; }
-      .left { margin-bottom: 2rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card h4 {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .card p {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .chart-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .checklist ul,
+    .quick-actions ul {
+      margin-top: 1rem;
+      list-style: none;
+      padding: 0;
+    }
+    .checklist li,
+    .quick-actions li {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .pending {
+      color: red;
+    }
+    .quick-actions li {
+      background: #e9edfb;
+      padding: 0.5rem;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <header>HireSight</header>
+  <header class="header">
+    <div class="logo">HireSight</div>
+    <nav class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Settings</a>
+      <a href="#">Logout</a>
+    </nav>
+  </header>
 
-  <div class="container">
-    <div class="left">
-      <h2>Create Your HireSight Account</h2>
-      <p>Sign up to access your dashboard, build stunning resumes, and land interviews faster. It only takes a minute to get started!</p>
+  <main class="dashboard">
+    <div class="stats">
+      <div class="card"><h4>Total Employees</h4><p>428</p></div>
+      <div class="card"><h4>Open Positions</h4><p>12</p></div>
+      <div class="card"><h4>Pending Leaves</h4><p>6 Requests</p></div>
+      <div class="card"><h4>Notifications</h4><p>3 New Applications<br>Policy Update</p></div>
     </div>
-    <div class="right">
-      <h2>Register</h2>
-      <form>
-        <select required>
-          <option value="">User Type</option>
-          <option value="applicant">Applicant</option>
-          <option value="hr">HR</option>
-        </select>
-        <input type="text" placeholder="Full Name" required />
-        <input type="email" placeholder="Email" required />
-        <input type="password" placeholder="Password" required />
-        <input type="password" placeholder="Confirm Password" required />
-        <button type="submit">Register</button>
-      </form>
-      <div class="or">or continue with</div>
-      <div class="socials">
-        <button>Google</button>
-        <button>LinkedIn</button>
+
+    <div class="charts">
+      <div class="chart-card">
+        <h4>Monthly Hiring Trend</h4>
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Experience Range Distribution</h4>
+        <canvas id="barChart"></canvas>
       </div>
     </div>
-  </div>
 
-  <footer>© 2025 HireSight. All rights reserved.</footer>
+    <div class="bottom">
+      <div class="card checklist">
+        <h4>Compliance Checklist</h4>
+        <ul>
+          <li>✔ Attendance Monitoring</li>
+          <li>✔ Policy Updated</li>
+          <li>✔ Salary Processed</li>
+          <li class="pending">❌ Performance Review Pending</li>
+        </ul>
+      </div>
+      <div class="card quick-actions">
+        <h4>Admin Quick Actions</h4>
+        <ul>
+          <li>🔍 Review Resumes</li>
+          <li>📝 Approve Time-Off</li>
+          <li>📊 Update Policy Docs</li>
+          <li>👩‍💼 Assign HR Roles</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const ctxLine = document.getElementById('lineChart').getContext('2d');
+    new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+          label: 'Hiring',
+          data: [5, 9, 7, 12, 11, 15, 12],
+          borderColor: '#8661f2',
+          backgroundColor: 'rgba(134,97,242,0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['0-2 yrs', '2-5 yrs', '5-10 yrs', '10+ yrs'],
+        datasets: [{
+          label: 'Employees',
+          data: [40, 80, 90, 50],
+          backgroundColor: ['#bfa4ff', '#a48ef0', '#8661f2', '#b0b6d1']
+        }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: 'y',
+        scales: {
+          x: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
 </body>
 </html>
