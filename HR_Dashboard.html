@@ -2,154 +2,195 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HireSight HR Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HireSight Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: #f3f4f6;
-    }
-    header {
-      background: #8e6fdf;
-      padding: 20px;
-      color: white;
-      font-size: 24px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .container {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    .highlight {
-      font-size: 22px;
-      font-weight: bold;
-    }
-    .label {
-      color: gray;
-    }
-    .row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .actions button {
-      padding: 10px 15px;
-      margin: 5px;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
-    .add { background: #6366f1; }
-    .approve { background: #10b981; }
-    .assign { background: #f59e0b; }
-    .alert { background: #ef4444; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    td, th {
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
-    }
-    .legend {
-      font-size: 14px;
-      margin-top: 10px;
-    }
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f0fb;
+  color: #333;
+}
+.header {
+  background: #a490f0;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+.logo {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+.nav a {
+  margin-left: 1.5rem;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+.dashboard {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.card {
+  background: linear-gradient(135deg, #e6ddfb, #d8c4f3);
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+}
+.card h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #5b3cc4;
+}
+.card p {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #3d2c8d;
+}
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.chart-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.chart-card h4 {
+  margin-bottom: 10px;
+  text-align: center;
+  color: #4b2991;
+}
+canvas {
+  max-height: 180px !important;
+}
+.bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.checklist ul,
+.quick-actions ul {
+  margin-top: 1rem;
+  list-style: none;
+  padding: 0;
+}
+.checklist li,
+.quick-actions li {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+.pending {
+  color: #dc2626;
+}
+.quick-actions li {
+  background: #ede9fe;
+  padding: 0.5rem;
+  border-radius: 5px;
+  color: #4c1d95;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+th {
+  background: #f3e8ff;
+  color: #4b0082;
+}
+tr:hover {
+  background: #f0f4ff;
+}
+
   </style>
 </head>
 <body>
-  <header>
-    <div>HireSight</div>
-    <div>Welcome, HR Manager</div>
+  <header class="header">
+    <div class="logo">HireSight</div>
+    <nav class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Settings</a>
+      <a href="#">Logout</a>
+    </nav>
   </header>
 
-  <div class="container">
-    <div class="card">
-      <div class="highlight" id="totalEmployees">152</div>
-      <div class="label">Total Employees</div>
-    </div>
-    <div class="card">
-      <div class="highlight" id="onLeave">7</div>
-      <div class="label">On Leave Today</div>
-    </div>
-    <div class="card">
-      <div class="highlight" id="tasksDue">12</div>
-      <div class="label">Tasks Due</div>
-    </div>
-    <div class="card">
-      <div class="highlight" id="performance">85%</div>
-      <div class="label">Avg. Performance</div>
+  <main class="dashboard">
+    <!-- Summary Cards -->
+    <div class="stats">
+      <div class="card"><h4>Total Employees</h4><p>152</p></div>
+      <div class="card"><h4>Projects</h4><p>7</p></div>
+      <div class="card"><h4>Tasks</h4><p>12</p></div>
+      <div class="card"><h4>Avg. Performance</h4><p>85%</p></div>
     </div>
 
-    <div class="card" style="grid-column: span 2;">
-      <h3>Recent Activities</h3>
-      <ul>
-        <li>John applied for leave - 2 days</li>
-        <li>Project Alpha task completed</li>
-        <li>New candidate submitted resume</li>
-        <li>Performance review updated</li>
-      </ul>
+    <!-- Applicant Status Summary -->
+    <div class="stats">
+      <div class="card"><h4>Total Applicants</h4><p>150</p></div>
+      <div class="card"><h4>Shortlisted</h4><p>45</p></div>
+      <div class="card"><h4>Interviewed</h4><p>75</p></div>
+      <div class="card"><h4>Rejected</h4><p>30</p></div>
     </div>
 
-    <div class="card">
-      <h3>Attendance Summary</h3>
-      <p>
-        ✅ Present: <strong>135</strong><br>
-        ❌ Absent: <strong>10</strong><br>
-        ⏰ Late: <strong>7</strong>
-      </p>
-    </div>
-
-    <div class="card">
-      <h3>Employee by Department</h3>
-      <canvas id="barChart"></canvas>
-    </div>
-
-    <div class="card">
-      <h3>Performance Distribution</h3>
-      <canvas id="pieChart"></canvas>
-    </div>
-
-    <div class="card">
-      <h3>Leave Requests</h3>
-      <table>
-        <tr><th>Name</th><th>Type</th><th>Dates</th><th>Status</th></tr>
-        <tr><td>Jane Doe</td><td>Casual</td><td>8-9 Jul</td><td>Pending</td></tr>
-        <tr><td>Mike Ross</td><td>Sick</td><td>5-6 Jul</td><td style="color:green">Approved</td></tr>
-      </table>
-    </div>
-
-    <div class="card">
-      <h3>Notifications</h3>
-      <ul>
-        <li>📌 Employee engagement survey open</li>
-        <li>📅 Q3 team meeting on 15th July</li>
-        <li>📎 Resume screening pending for 3 roles</li>
-      </ul>
-    </div>
-
-    <div class="card" style="grid-column: span 3;">
-      <h3>Quick Actions</h3>
-      <div class="actions">
-        <button class="add">Add Employee</button>
-        <button class="approve">Approve Leave</button>
-        <button class="assign">Assign Task</button>
-        <button class="alert">Send Alert</button>
+    <!-- Charts -->
+    <div class="charts">
+      <div class="chart-card">
+        <h4>Employee by Department</h4>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Performance Distribution</h4>
+        <canvas id="pieChart"></canvas>
       </div>
     </div>
+
+    <!-- Replace this section -->
+<div class="bottom">
+  <div class="card">
+    <h4>Quick Actions</h4>
+    <ul class="quick-actions">
+      <li>➕ Add Employee</li>
+      <li>✅ Approve Leave</li>
+      <li>📋 Assign Task</li>
+      <li>🚨 Send Alert</li>
+    </ul>
   </div>
+  <div class="card quick-actions">
+    <h4>Notifications</h4>
+    <ul>
+      <li>📌 Employee engagement survey open</li>
+      <li>📅 Q3 team meeting on 15th July</li>
+      <li>📎 Resume screening pending for 3 roles</li>
+    </ul>
+  </div>
+</div>
+</main>
 
   <script>
     const barChart = new Chart(document.getElementById('barChart'), {
