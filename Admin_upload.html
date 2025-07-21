@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="csvUploadApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HireSight - CSV Upload</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f0ff; margin: 0; }
+    .header { background: #a490f0; color: white; display: flex; justify-content: space-between; padding: 1rem 2rem; }
+    .app-name { font-weight: bold; font-size: 1.5rem; }
+    .nav a { margin-left: 1.5rem; color: white; text-decoration: none; font-weight: 500; }
+    .nav a:hover { text-decoration: underline; }
+    .container { padding: 2rem; display: flex; justify-content: center; }
+    .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); width: 100%; max-width: 800px; }
+    h2 { color: #333; margin-top: 0; margin-bottom: 1.5rem; font-size: 1.75rem; border-bottom: 2px solid #e9edfb; padding-bottom: 0.75rem; }
+    .drag-drop-area { border: 2px dashed #b0b6d1; border-radius: 8px; padding: 60px; text-align: center; color: #666; cursor: pointer; font-size: 1.1rem; }
+    .or-separator { text-align: center; margin: 20px 0; font-weight: bold; color: #666; position: relative; }
+    .or-separator::before, .or-separator::after { content: ""; position: absolute; top: 50%; width: 40%; height: 1px; background-color: #ddd; }
+    .or-separator::before { left: 0; }
+    .or-separator::after { right: 0; }
+
+    .upload-btn {
+      width: 100%;
+      max-width: 100%;
+      height: 55px;
+      font-size: 1rem;
+      background-color: #a490f0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background-color: #9178f0;
+    }
+
+    .message { padding: 1rem; margin-top: 1rem; border-radius: 6px; font-weight: bold; }
+    .success { background: #e6ffe6; color: #28a745; }
+    .error { background: #ffe6e6; color: #dc3545; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #ddd; padding: 0.75rem; }
+    th { background-color: #b0b6d1; color: white; }
+    .status-active { color: #28a745; font-weight: bold; }
+    .status-deactivated { color: #ffc107; font-weight: bold; }
+    .status-failed { color: #dc3545; font-weight: bold; }
+  </style>
+</head>
+<body ng-controller="CsvController">
+  <header class="header">
+    <div class="app-name">HireSight</div>
+    <nav class="nav">
+      <a href="#">Home</a>
+      <a href="#">Login</a>
+      <a href="#">Register</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>CSV Upload Page</h2>
+      <p>Upload job application data in bulk. Validate headers like Applicant, Position, Status, etc.</p>
+
+      <div class="drag-drop-area" ng-click="triggerInput()" ng-drop="handleDrop($event)">
+        Drag & Drop CSV File Here
+        <span ng-show="fileName"><br><strong>Selected:</strong> {{ fileName }}</span>
+      </div>
+
+      <div class="or-separator">OR</div>
+
+      <div style="text-align:center;">
+        <input type="file" id="fileInput" accept=".csv" style="display:none;" onchange="angular.element(this).scope().handleFile(this.files)">
+        <button class="upload-btn" ng-click="triggerInput()">Select File</button>
+      </div>
+
+      <div style="text-align:center;">
+        <button class="upload-btn" style="margin-top:20px; width:160px;" ng-click="submit()">Submit CSV</button>
+      </div>
+
+      <div class="message success" ng-show="successMsg">{{ successMsg }}</div>
+      <div class="message error" ng-show="errorMsg">{{ errorMsg }}</div>
+
+      <div ng-show="records.length > 0">
+        <h3>Processed Record Details</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Applicant Name</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="record in records">
+              <td>{{ record.name }}</td>
+              <td>{{ record.position }}</td>
+              <td><span class="status-{{ record.status | lowercase }}">{{ record.status }}</span></td>
+              <td><button class="btn" style="padding:5px 10px;" ng-click="view(record)">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Summary:</strong> {{ summary }}</p>
+      </div>
+    </section>
+  </main>
+
+  <footer style="text-align:center; padding:20px; color:#777;">
+    © 2025 HireSight. All rights reserved.
+  </footer>
+
+  <script>
+    angular.module('csvUploadApp', [])
+      .controller('CsvController', ['$scope', function ($scope) {
+        $scope.fileName = '';
+        $scope.successMsg = '';
+        $scope.errorMsg = '';
+        $scope.records = [];
+        $scope.summary = '';
+
+        $scope.triggerInput = function () {
+          document.getElementById('fileInput').click();
+        };
+
+        $scope.handleFile = function (files) {
+          if (files.length > 0) {
+            $scope.fileName = files[0].name;
+            $scope.currentFile = files[0];
+            $scope.successMsg = '';
+            $scope.errorMsg = '';
+            $scope.records = [];
+            $scope.summary = '';
+            $scope.$apply();
+          }
+        };
+
+        $scope.submit = function () {
+          if (!$scope.currentFile) {
+            $scope.errorMsg = 'Please select a CSV file first.';
+            return;
+          }
+
+          const total = Math.floor(Math.random() * 50) + 10;
+          const failed = Math.floor(Math.random() * 5);
+          const success = total - failed;
+
+          $scope.successMsg = `${success} records processed successfully.`;
+          $scope.errorMsg = failed > 0 ? `${failed} failed due to errors.` : '';
+          $scope.records = [
+            { name: "Alice Wonderland", position: "Marketing Specialist", status: "Active" },
+            { name: "Bob Builder", position: "Construction Manager", status: "Active" },
+            { name: "Charlie Chaplin", position: "Data Analyst", status: "Deactivated" },
+            { name: "Diana Prince", position: "Project Lead", status: "Active" },
+            { name: "Eve Harrington", position: "HR Generalist", status: "Failed" }
+          ];
+          $scope.summary = `${success} processed, ${failed} failed, total ${total}`;
+        };
+
+        $scope.view = function (record) {
+          alert(`Viewing record for ${record.name}`);
+        };
+      }]);
+  </script>
+</body>
+</html>
