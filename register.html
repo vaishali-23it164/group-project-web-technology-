@@ -6,7 +6,6 @@
   <title>Register | HireSight</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Same styling as login */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -39,6 +38,7 @@
       justify-content: space-between;
       padding: 4rem 10%;
       align-items: center;
+      animation: fadeIn 0.7s ease-in;
     }
     .left {
       flex: 1;
@@ -62,6 +62,18 @@
       font-size: 1rem;
       max-width: 500px;
     }
+
+    /* Right form block gets ng-if animation */
+    .right.form-slide.ng-enter {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    .right.form-slide.ng-enter-active {
+      opacity: 1;
+      transform: translateX(0);
+      transition: all 0.5s ease-in-out;
+    }
+
     .right {
       background: white;
       padding: 2rem;
@@ -82,6 +94,18 @@
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
+      background-repeat: no-repeat;
+      background-position: 0.75rem center;
+      background-size: 1rem;
+    }
+    input[type="text"] {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/1077/1077114.png');
+    }
+    input[type="email"] {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/561/561127.png');
+    }
+    input[type="password"] {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/3064/3064155.png');
     }
     button {
       width: 100%;
@@ -94,6 +118,7 @@
       font-weight: bold;
       cursor: pointer;
       margin-bottom: 1rem;
+      transition: background 0.3s ease;
     }
     button:hover {
       background: linear-gradient(to right, #00a3a0, #008b8a);
@@ -125,6 +150,10 @@
         height: 200px;
       }
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body ng-controller="RegisterController">
@@ -139,7 +168,7 @@
 
 <div class="container">
   <div class="left">
-    <iframe src="https://www.youtube.com/embed/TXfVqhY9KAI?autoplay=1&mute=1&loop=1&playlist=TXfVqhY9KAI"
+    <iframe src="https://www.youtube.com/embed/SvjP8kXWuyY?autoplay=1&mute=1&loop=1&playlist=SvjP8kXWuyY"
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen></iframe>
@@ -147,21 +176,22 @@
     <p>Create your account to unlock your personalized hiring dashboard and start your journey to success.</p>
   </div>
 
-  <div class="right">
+  <!-- Right block now animates using ng-if -->
+  <div class="right form-slide" ng-if="true">
     <h2>Register</h2>
     <form name="registerForm" ng-submit="register()" novalidate>
       <select ng-model="user.role">
         <option value="">Select user type</option>
-        <option value="admin">Admin</option>
-        <option value="jobseeker">Job Seeker</option>
-        <option value="hr">HR</option>
+        <option value="admin">{{'admin' | capitalize}}</option>
+        <option value="jobseeker">{{'jobseeker' | capitalize}}</option>
+        <option value="hr">{{'hr' | capitalize}}</option>
       </select>
       <div class="form-error" ng-show="errors.role">{{ errors.role }}</div>
 
       <input type="text" placeholder="Full Name" ng-model="user.name" />
       <div class="form-error" ng-show="errors.name">{{ errors.name }}</div>
 
-      <input type="email" placeholder="you@example.com" ng-model="user.email" />
+      <input type="email" placeholder="you@example.com" ng-model="user.email" email-checker />
       <div class="form-error" ng-show="errors.email">{{ errors.email }}</div>
 
       <input type="password" placeholder="Password" ng-model="user.password" />
@@ -178,11 +208,13 @@
 <footer>© 2025 HireSight. All rights reserved.</footer>
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
 <script>
-  angular.module('hireSightApp', [])
+  angular.module('hireSightApp', ['ngAnimate'])
     .controller('RegisterController', ['$scope', '$window', function($scope, $window) {
       $scope.user = {};
       $scope.errors = {};
+
       $scope.register = function () {
         $scope.errors = {};
         let valid = true;
@@ -195,10 +227,16 @@
           $scope.errors.name = "Name must be at least 3 characters.";
           valid = false;
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
         if (!emailRegex.test($scope.user.email || '')) {
           $scope.errors.email = "Enter a valid email.";
           valid = false;
+        } else {
+          const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
+          if (users.some(u => u.email.toLowerCase() === $scope.user.email.toLowerCase())) {
+            $scope.errors.email = "Email is already registered.";
+            valid = false;
+          }
         }
         if (!$scope.user.password || $scope.user.password.length < 6) {
           $scope.errors.password = "Password must be at least 6 characters.";
@@ -212,13 +250,40 @@
         if (!valid) return;
 
         const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
-        
+        users.push({
+          role: $scope.user.role,
+          name: $scope.user.name,
+          email: $scope.user.email,
+          password: $scope.user.password
+        });
+
         localStorage.setItem("hiresight_users", JSON.stringify(users));
         alert("Registration successful! Please log in.");
         $window.location.href = "login.html";
       };
-    }]);
+    }])
+    .filter('capitalize', function () {
+      return function (input) {
+        return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+      };
+    })
+    .directive('emailChecker', function () {
+      return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, element, attrs, ngModel) {
+          ngModel.$parsers.push(function (value) {
+            const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
+            const taken = users.some(u => u.email.toLowerCase() === value.toLowerCase());
+            ngModel.$setValidity('emailTaken', !taken);
+            return value;
+          });
+        }
+      };
+    });
 </script>
 
 </body>
 </html>
+
+
