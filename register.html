@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="hireSightApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | HireSight</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Same styling as login */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: #f0f0ff;
+      color: #333;
+    }
+    header {
+      background: #a490f0;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    .nav a {
+      margin-left: 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      padding: 4rem 10%;
+      align-items: center;
+    }
+    .left {
+      flex: 1;
+      padding-right: 4rem;
+    }
+    .left iframe {
+      width: 100%;
+      max-width: 640px;
+      height: 360px;
+      border-radius: 16px;
+      border: none;
+      margin-bottom: 1.5rem;
+    }
+    .left h2 {
+      font-size: 2rem;
+      color: #6f42c1;
+      margin-bottom: 1rem;
+    }
+    .left p {
+      color: #555;
+      font-size: 1rem;
+      max-width: 500px;
+    }
+    .right {
+      background: white;
+      padding: 2rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      flex: 1;
+      max-width: 400px;
+    }
+    .right h2 {
+      text-align: center;
+      color: #6f42c1;
+      margin-bottom: 1.5rem;
+    }
+    select, input {
+      width: 100%;
+      padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(to right, #00c3b8, #00a3a0);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    button:hover {
+      background: linear-gradient(to right, #00a3a0, #008b8a);
+    }
+    .form-error {
+      color: red;
+      font-size: 0.85rem;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 2rem;
+      color: #888;
+      border-top: 1px solid #eee;
+      background: #f2f2f2;
+    }
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+        padding: 2rem;
+      }
+      .left, .right {
+        max-width: 100%;
+        padding: 0;
+      }
+      .left iframe {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body ng-controller="RegisterController">
+
+<header>
+  <div class="logo">HireSight</div>
+  <nav class="nav">
+    <a href="login.html">Home</a>
+    <a href="login.html">Login</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="left">
+    <iframe src="https://www.youtube.com/embed/TXfVqhY9KAI?autoplay=1&mute=1&loop=1&playlist=TXfVqhY9KAI"
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+    <h2>Join HireSight Today</h2>
+    <p>Create your account to unlock your personalized hiring dashboard and start your journey to success.</p>
+  </div>
+
+  <div class="right">
+    <h2>Register</h2>
+    <form name="registerForm" ng-submit="register()" novalidate>
+      <select ng-model="user.role">
+        <option value="">Select user type</option>
+        <option value="admin">Admin</option>
+        <option value="jobseeker">Job Seeker</option>
+        <option value="hr">HR</option>
+      </select>
+      <div class="form-error" ng-show="errors.role">{{ errors.role }}</div>
+
+      <input type="text" placeholder="Full Name" ng-model="user.name" />
+      <div class="form-error" ng-show="errors.name">{{ errors.name }}</div>
+
+      <input type="email" placeholder="you@example.com" ng-model="user.email" />
+      <div class="form-error" ng-show="errors.email">{{ errors.email }}</div>
+
+      <input type="password" placeholder="Password" ng-model="user.password" />
+      <div class="form-error" ng-show="errors.password">{{ errors.password }}</div>
+
+      <input type="password" placeholder="Confirm Password" ng-model="user.confirmPassword" />
+      <div class="form-error" ng-show="errors.confirmPassword">{{ errors.confirmPassword }}</div>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+</div>
+
+<footer>© 2025 HireSight. All rights reserved.</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<script>
+  angular.module('hireSightApp', [])
+    .controller('RegisterController', ['$scope', '$window', function($scope, $window) {
+      $scope.user = {};
+      $scope.errors = {};
+      $scope.register = function () {
+        $scope.errors = {};
+        let valid = true;
+
+        if (!$scope.user.role) {
+          $scope.errors.role = "Please select a user type.";
+          valid = false;
+        }
+        if (!$scope.user.name || $scope.user.name.length < 3) {
+          $scope.errors.name = "Name must be at least 3 characters.";
+          valid = false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test($scope.user.email || '')) {
+          $scope.errors.email = "Enter a valid email.";
+          valid = false;
+        }
+        if (!$scope.user.password || $scope.user.password.length < 6) {
+          $scope.errors.password = "Password must be at least 6 characters.";
+          valid = false;
+        }
+        if ($scope.user.password !== $scope.user.confirmPassword) {
+          $scope.errors.confirmPassword = "Passwords do not match.";
+          valid = false;
+        }
+
+        if (!valid) return;
+
+        const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
+        
+        localStorage.setItem("hiresight_users", JSON.stringify(users));
+        alert("Registration successful! Please log in.");
+        $window.location.href = "login.html";
+      };
+    }]);
+</script>
+
+</body>
+</html>

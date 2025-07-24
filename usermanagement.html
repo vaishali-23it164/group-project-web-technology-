@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireSight - User Management</title>
+    <style>
+        /* Universal Reset for consistent rendering */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Applying UI color background from the dashboard code */
+        body {
+            font-family: 'Segoe UI', sans-serif; /* Font from dashboard */
+            background: #f0f0ff; /* Light purple background from dashboard */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header styles from dashboard */
+        .header {
+            background: #a490f0; /* Header color from dashboard */
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem; /* Padding from dashboard */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Added subtle shadow */
+        }
+
+        /* App name/Logo style from dashboard */
+        .app-name {
+            font-weight: bold;
+            font-size: 1.5rem; /* Logo size from dashboard */
+            color: white; /* Text color for logo */
+        }
+
+        /* Nav links style from dashboard */
+        .nav a {
+            margin-left: 1.5rem; /* Margin from dashboard */
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 2rem; /* Padding from dashboard main */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to the top */
+        }
+
+        .card {
+            background: white; /* Card background from dashboard */
+            padding: 2rem; /* Adjusted padding for content */
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Shadow from dashboard card */
+            width: 100%;
+            max-width: 900px; /* Set max-width for consistency */
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 1.5rem; /* Consistent margin */
+            font-size: 1.75rem; /* Larger heading */
+            border-bottom: 2px solid #e9edfb; /* Lighter border for heading */
+            padding-bottom: 0.75rem;
+        }
+
+        .card p {
+            margin-bottom: 1.5rem; /* Consistent spacing below paragraphs in cards */
+            line-height: 1.5; /* Improve readability */
+        }
+
+        /* User Management specific styles - Adjusted to new UI theme */
+        .button-group {
+            margin-bottom: 2rem; /* Increased space below buttons */
+            display: flex;
+            gap: 0.75rem; /* Consistent gap between buttons */
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #e9edfb; /* Light background for default button from dashboard */
+            color: #333;
+            border: none; /* No border for default button */
+            padding: 0.75rem 1.5rem; /* Consistent padding */
+            border-radius: 5px; /* Rounded corners from dashboard buttons */
+            cursor: pointer;
+            font-weight: 600; /* Bolder font */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background-color: #dbe2f8; /* Darker hover for light button */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn.primary {
+            background-color: #a490f0; /* Primary color from dashboard theme */
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* Stronger shadow */
+        }
+
+        .btn.primary:hover {
+            background-color: #8f7ce0; /* Darker hover for primary button */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn.deactivate {
+            background-color: #ff6b6b; /* Softer red from dashboard elements */
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .btn.deactivate:hover {
+            background-color: #ff4747;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem; /* Consistent padding */
+            border: 1px solid #b0b6d1; /* Border color inspired by dashboard */
+            border-radius: 5px;
+            margin-bottom: 2rem; /* Increased space below search bar */
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .user-table th,
+        .user-table td {
+            border: 1px solid #f0f0ff; /* Lighter border for cells */
+            padding: 0.8rem 1rem; /* Adjusted padding */
+            text-align: left;
+        }
+
+        .user-table th {
+            background-color: #b0b6d1; /* Header color from dashboard elements */
+            color: white;
+            font-weight: 600; /* Bolder header font */
+        }
+
+        .user-table tbody tr:nth-child(odd) {
+            background-color: #f8f8ff; /* Slightly different background for odd rows */
+        }
+
+        .user-table tbody tr:hover {
+            background-color: #e9edfb; /* Hover color from dashboard list items */
+        }
+
+        /* Status styling for table cells */
+        .status-active {
+            color: #28a745; /* Green */
+            font-weight: bold;
+        }
+        .status-deactivated {
+            color: #ffc107; /* Orange/Yellow */
+            font-weight: bold;
+        }
+        .status-pending {
+            color: #007bff; /* Blue */
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #f0f2f5;
+            padding: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="app-name">HireSight</div>
+        <nav class="nav">
+            <a href="adminhome.html" class="nav-link">Home</a> <a href="login.html" class="nav-link">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>User Management</h2>
+            <p>Create, edit, and manage user access for the HireSight platform. Assign roles, reset passwords, and manage accounts easily.</p>
+            <div class="button-group">
+                <button class="btn primary">Add User</button>
+                <button class="btn primary">Edit User</button>
+                <button class="btn primary">Delete Selected</button>
+                <button class="btn primary">Reset Password</button>
+                <button class="btn deactivate">Deactivate</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search users by name, email, or role...">
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vaishali</td>
+                        <td>vaishali@example.com</td>
+                        <td>Admin</td>
+                        <td><span class="status-active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Preethi</td>
+                        <td>preethi@example.com</td>
+                        <td>Recruiter</td>
+                        <td><span class="status-deactivated">Deactivated</span></td>
+                    </tr>
+                    <tr>
+                        <td>Meenakshi</td>
+                        <td>meenakshi@example.com</td>
+                        <td>Job Seeker</td>
+                        <td><span class="status-active">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Anand</td>
+                        <td>anand@example.com</td>
+                        <td>Job Seeker</td>
+                        <td><span class="status-pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>Bharath</td>
+                        <td>bharath@example.com</td>
+                        <td>Interviewer</td>
+                        <td><span class="status-active">Active</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="footer">
+        © 2025 HireSight. All rights reserved.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Placeholder for User Management buttons
+            const userManagementButtons = document.querySelectorAll('.button-group .btn');
+            userManagementButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    alert(`"${button.textContent}" clicked! (Actual functionality requires backend)`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

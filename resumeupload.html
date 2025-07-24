@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="hireSightApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HireSight</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f7f8fc;
+    }
+
+    header {
+      background: linear-gradient(to right, #7b5fe8, #8a6ff1);
+      color: white;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    main {
+      padding: 30px 40px;
+    }
+
+    .upload-box, .tips-box, .fixes-box {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .upload-box h2,
+    .tips-box h3,
+    .fixes-box h3 {
+      color: #5728e1;
+      margin-top: 0;
+    }
+
+    .file-drop-area {
+      border: 2px dashed #ccc;
+      padding: 30px;
+      margin-top: 15px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    .file-drop-area button {
+      background-color: #00cfcf;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+
+    #beforeText, #afterText {
+      background-color: #f1f3f9;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 8px 0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body ng-controller="ResumeController">
+
+  <header>
+    <h1>HireSight</h1>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">Resume Suggester</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="upload-box">
+      <h2>📄 Upload Your Resume</h2>
+      <p>Drop your resume here (PDF or Word) and we’ll give you tailored improvement tips instantly.</p>
+      <div class="file-drop-area">
+        <input type="file" id="resumeInput" accept=".pdf,.doc,.docx" hidden 
+               onchange="angular.element(this).scope().handleFileChange(this.files)" />
+        <button ng-click="triggerFileInput()">Select File</button>
+      </div>
+    </section>
+
+    <section class="tips-box">
+      <h3>✅ Quick Resume Tips</h3>
+      <ul>
+        <li ng-repeat="tip in tips | uppercaseFirst">{{ tip }}</li>
+      </ul>
+    </section>
+
+    <section class="fixes-box" ng-show="showFixes">
+      <h3>Resume Fixes</h3>
+      <p><strong>Before:</strong></p>
+      <p id="beforeText">{{ beforeText }}</p>
+      <p><strong>After:</strong></p>
+      <p id="afterText">{{ afterText }}</p>
+    </section>
+  </main>
+
+  <script>
+    angular.module('hireSightApp', [])
+      .controller('ResumeController', ['$scope', function ($scope) {
+        $scope.tips = [
+          "keep it to 1–2 pages depending on experience.",
+          "use bullet points instead of paragraphs.",
+          "tailor your resume for each job application.",
+          "highlight key skills in a dedicated section.",
+          "avoid using personal pronouns (I, me, my)."
+        ];
+
+        $scope.beforeText = "";
+        $scope.afterText = "";
+        $scope.showFixes = false;
+
+        $scope.triggerFileInput = function () {
+          document.getElementById('resumeInput').click();
+        };
+
+        $scope.handleFileChange = function (files) {
+          const file = files[0];
+          if (file) {
+            const fileName = file.name;
+            $scope.beforeText = `Resume: ${fileName}\n• I am a hardworking individual.\n• I did my internship in XYZ.\n• Seeking job opportunities.`;
+            $scope.afterText = `• Proven track record of delivering results during internship at XYZ Pvt Ltd.\n• Demonstrated strong work ethic and project management skills.\n• Actively seeking roles in Software Development with growth potential.`;
+            $scope.showFixes = true;
+            $scope.$apply(); // update bindings after file load
+          }
+        };
+      }])
+      .filter('uppercaseFirst', function () {
+        return function (items) {
+          return items.map(item => item.charAt(0).toUpperCase() + item.slice(1));
+        };
+      });
+  </script>
+</body>
+</html>
