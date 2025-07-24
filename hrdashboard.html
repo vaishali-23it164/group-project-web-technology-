@@ -1,0 +1,306 @@
+
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HireSight Dashboard</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f0fb;
+      color: #333;
+    }
+    .header {
+      background: #a490f0;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    .nav a {
+      margin-left: 1.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .dashboard {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: linear-gradient(135deg, #e6ddfb, #d8c4f3);
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .card h4 {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+      color: #5b3cc4;
+    }
+    .card p {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #3d2c8d;
+    }
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .chart-card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .chart-card h4 {
+      margin-bottom: 10px;
+      text-align: center;
+      color: #4b2991;
+    }
+    canvas {
+      max-height: 180px !important;
+    }
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .filters select {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #ede9fe;
+      color: #4c1d95;
+      font-weight: 500;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f3e8ff;
+      color: #4b0082;
+    }
+    tr:hover {
+      background: #f0f4ff;
+    }
+  </style>
+</head>
+<body ng-controller="MainController">
+  <header class="header">
+    <div class="logo">HireSight</div>
+    <nav class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Settings</a>
+      <a href="#">Logout</a>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+
+    <!-- Applicant Status Summary -->
+    <div class="stats">
+      <div class="card"><h4>Total Applicants</h4><p>150</p></div>
+      <div class="card"><h4>Shortlisted</h4><p>45</p></div>
+      <div class="card"><h4>Interviewed</h4><p>75</p></div>
+      <div class="card"><h4>Pending</h4><p>12</p></div>
+      <div class="card"><h4>Rejected</h4><p>30</p></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts">
+      <div class="chart-card">
+        <h4>Applicants by Job Status</h4>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Performance Distribution</h4>
+        <canvas id="pieChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Filters with ng-model -->
+    <div class="card">
+      <div class="filters">
+        <select ng-model="selectedProject">
+          <option>Select Project</option>
+          <option>Project Alpha</option>
+          <option>Project Beta</option>
+        </select>
+       <select ng-model="selectedFilterKey">
+  <option value="">-- Select --</option>
+  <option value="location">Location</option>
+  <option value="experience">Experience</option>
+</select>
+
+<input type="text" ng-model="searchTerm" placeholder="Enter value to search" />
+
+      </div>
+
+      <!-- Bindings example -->
+      <div style="padding: 0 1rem 1rem;">
+        <strong>Selected Project:</strong> {{ selectedProject }} <br/>
+        <strong>Filter:</strong> {{ selectedFilter }}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ApplicantID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>AppliedDate</th>
+            <th>Status</th>
+            <th>Experience</th>
+            <th>Skills</th>
+            <th>Education</th>
+            <th>Portfolio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1001</td>
+            <td>{{ userName }}</td>
+            <td>alice@example.com</td>
+            <td>+1234567890</td>
+            <td>2025-07-01</td>
+            <td>Shortlisted</td>
+            <td>3 yrs</td>
+            <td>HTML, CSS, JS</td>
+            <td>B.Sc CS</td>
+            <td><a href="#">View</a></td>
+          </tr>
+          <tr>
+            <td>1002</td>
+            <td>Bob Johnson</td>
+            <td>bob@example.com</td>
+            <td>+0987654321</td>
+            <td>2025-07-05</td>
+            <td>Interviewed</td>
+            <td>5 yrs</td>
+            <td>React, Node.js</td>
+            <td>MCA</td>
+            <td><a href="#">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const barChart = new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager'],
+        datasets: [
+          {
+            label: 'Eligible',
+            data: [12, 19, 7, 5, 3],
+            backgroundColor: '#a78bfa'
+          },
+          {
+            label: 'Not Eligible',
+            data: [4, 6, 2, 3, 1],
+            backgroundColor: '#c4b5fd'
+          },
+          {
+            label: 'Hired',
+            data: [1, 2, 1, 1, 1],
+            backgroundColor: '#8b5cf6'
+          },
+          {
+            label: 'Pending',
+            data: [5, 8, 3, 2, 1],
+            backgroundColor: '#ddd6fe'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: '#4b2991'
+            }
+          }
+        }
+      }
+    });
+
+    const pieChart = new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ['Excellent', 'Good', 'Average', 'Poor'],
+        datasets: [
+          {
+            data: [40, 35, 15, 10],
+            backgroundColor: ['#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe']
+          }
+        ]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  </script>
+
+  <script>
+    angular.module('myApp', [])
+      .controller('MainController', function($scope) {
+        $scope.selectedProject = "Project Alpha";
+        $scope.selectedFilter = "Experience";
+        $scope.userName = "Alice Smith";
+      });
+  </script>
+<script>
+  // Define the value to be injected
+  angular.module('myApp')
+    .value('defaultUser', 'Alice Smith');
+
+  // Override or extend the controller to inject the value
+  angular.module('myApp')
+    .controller('MainController', ['$scope', 'defaultUser', function($scope, defaultUser) {
+      $scope.selectedProject = "Project Alpha";
+      $scope.selectedFilter = "Experience";
+      $scope.userName = defaultUser; // Injected value
+    }]);
+</script>
+
+</body>
+</html>
