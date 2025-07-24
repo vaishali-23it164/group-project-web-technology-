@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HireSight</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-animate.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -86,6 +87,13 @@
       margin: 8px 0;
       white-space: pre-wrap;
     }
+
+    .fade {
+      transition: opacity 0.5s;
+    }
+    .ng-hide {
+      opacity: 0;
+    }
   </style>
 </head>
 <body ng-controller="ResumeController">
@@ -102,7 +110,7 @@
     <section class="upload-box">
       <h2>📄 Upload Your Resume</h2>
       <p>Drop your resume here (PDF or Word) and we’ll give you tailored improvement tips instantly.</p>
-      <div class="file-drop-area">
+      <div class="file-drop-area" file-drop-area>
         <input type="file" id="resumeInput" accept=".pdf,.doc,.docx" hidden 
                onchange="angular.element(this).scope().handleFileChange(this.files)" />
         <button ng-click="triggerFileInput()">Select File</button>
@@ -116,7 +124,7 @@
       </ul>
     </section>
 
-    <section class="fixes-box" ng-show="showFixes">
+    <section class="fixes-box" ng-show="showFixes" class="fade">
       <h3>Resume Fixes</h3>
       <p><strong>Before:</strong></p>
       <p id="beforeText">{{ beforeText }}</p>
@@ -126,40 +134,70 @@
   </main>
 
   <script>
-    angular.module('hireSightApp', [])
-      .controller('ResumeController', ['$scope', function ($scope) {
-        $scope.tips = [
-          "keep it to 1–2 pages depending on experience.",
-          "use bullet points instead of paragraphs.",
-          "tailor your resume for each job application.",
-          "highlight key skills in a dedicated section.",
-          "avoid using personal pronouns (I, me, my)."
-        ];
+    // Define the AngularJS module
+    var app = angular.module('hireSightApp', ['ngAnimate']);
 
-        $scope.beforeText = "";
-        $scope.afterText = "";
-        $scope.showFixes = false;
+    // Factory to manage resume tips
+    app.factory('ResumeFactory', function() {
+      return {
+        getTips: function() {
+          return [
+            "keep it to 1–2 pages depending on experience.",
+            "use bullet points instead of paragraphs.",
+            "tailor your resume for each job application.",
+            "highlight key skills in a dedicated section.",
+            "avoid using personal pronouns (I, me, my)."
+          ];
+        }
+      };
+    });
 
-        $scope.triggerFileInput = function () {
-          document.getElementById('resumeInput').click();
-        };
+    // Controller with dependency injection
+    app.controller('ResumeController', ['$scope', 'ResumeFactory', function ($scope, ResumeFactory) {
+      $scope.tips = ResumeFactory.getTips();
 
-        $scope.handleFileChange = function (files) {
-          const file = files[0];
-          if (file) {
-            const fileName = file.name;
-            $scope.beforeText = `Resume: ${fileName}\n• I am a hardworking individual.\n• I did my internship in XYZ.\n• Seeking job opportunities.`;
-            $scope.afterText = `• Proven track record of delivering results during internship at XYZ Pvt Ltd.\n• Demonstrated strong work ethic and project management skills.\n• Actively seeking roles in Software Development with growth potential.`;
-            $scope.showFixes = true;
-            $scope.$apply(); // update bindings after file load
-          }
-        };
-      }])
-      .filter('uppercaseFirst', function () {
-        return function (items) {
-          return items.map(item => item.charAt(0).toUpperCase() + item.slice(1));
-        };
-      });
+      $scope.beforeText = "";
+      $scope.afterText = "";
+      $scope.showFixes = false;
+
+      $scope.triggerFileInput = function () {
+        document.getElementById('resumeInput').click();
+      };
+
+      $scope.handleFileChange = function (files) {
+        const file = files[0];
+        if (file) {
+          const fileName = file.name;
+          $scope.beforeText = `Resume: ${fileName}\n• I am a hardworking individual.\n• I did my internship in XYZ.\n• Seeking job opportunities.`;
+          $scope.afterText = `• Proven track record of delivering results during internship at XYZ Pvt Ltd.\n• Demonstrated strong work ethic and project management skills.\n• Actively seeking roles in Software Development with growth potential.`;
+          $scope.showFixes = true;
+          $scope.$apply(); // update bindings after file load
+        }
+      };
+    }]);
+
+    // Filter to capitalize the first letter of each tip
+    app.filter('uppercaseFirst', function () {
+      return function (items) {
+        return items.map(item => item.charAt(0).toUpperCase() + item.slice(1));
+      };
+    });
+
+    // Directive for file drop area
+    app.directive('fileDropArea', function() {
+      return {
+        restrict: 'A',
+        link: function(scope, element) {
+          element.bind('dragover', function(event) {
+            event.preventDefault();
+          });
+          element.bind('drop', function(event) {
+            event.preventDefault();
+            scope.handleFileChange(event.dataTransfer.files);
+          });
+        }
+      };
+    });
   </script>
 </body>
 </html>
