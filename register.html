@@ -62,8 +62,6 @@
       font-size: 1rem;
       max-width: 500px;
     }
-
-    /* Right form block gets ng-if animation */
     .right.form-slide.ng-enter {
       opacity: 0;
       transform: translateX(50px);
@@ -73,7 +71,6 @@
       transform: translateX(0);
       transition: all 0.5s ease-in-out;
     }
-
     .right {
       background: white;
       padding: 2rem;
@@ -157,7 +154,6 @@
   </style>
 </head>
 <body ng-controller="RegisterController">
-
 <header>
   <div class="logo">HireSight</div>
   <nav class="nav">
@@ -165,7 +161,6 @@
     <a href="login.html">Login</a>
   </nav>
 </header>
-
 <div class="container">
   <div class="left">
     <iframe src="https://www.youtube.com/embed/SvjP8kXWuyY?autoplay=1&mute=1&loop=1&playlist=SvjP8kXWuyY"
@@ -175,8 +170,6 @@
     <h2>Join HireSight Today</h2>
     <p>Create your account to unlock your personalized hiring dashboard and start your journey to success.</p>
   </div>
-
-  <!-- Right block now animates using ng-if -->
   <div class="right form-slide" ng-if="true">
     <h2>Register</h2>
     <form name="registerForm" ng-submit="register()" novalidate>
@@ -187,26 +180,19 @@
         <option value="hr">{{'hr' | capitalize}}</option>
       </select>
       <div class="form-error" ng-show="errors.role">{{ errors.role }}</div>
-
       <input type="text" placeholder="Full Name" ng-model="user.name" />
       <div class="form-error" ng-show="errors.name">{{ errors.name }}</div>
-
       <input type="email" placeholder="you@example.com" ng-model="user.email" email-checker />
       <div class="form-error" ng-show="errors.email">{{ errors.email }}</div>
-
       <input type="password" placeholder="Password" ng-model="user.password" />
       <div class="form-error" ng-show="errors.password">{{ errors.password }}</div>
-
       <input type="password" placeholder="Confirm Password" ng-model="user.confirmPassword" />
       <div class="form-error" ng-show="errors.confirmPassword">{{ errors.confirmPassword }}</div>
-
       <button type="submit">Register</button>
     </form>
   </div>
 </div>
-
 <footer>© 2025 HireSight. All rights reserved.</footer>
-
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
 <script>
@@ -246,9 +232,7 @@
           $scope.errors.confirmPassword = "Passwords do not match.";
           valid = false;
         }
-
         if (!valid) return;
-
         const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
         users.push({
           role: $scope.user.role,
@@ -256,7 +240,6 @@
           email: $scope.user.email,
           password: $scope.user.password
         });
-
         localStorage.setItem("hiresight_users", JSON.stringify(users));
         alert("Registration successful! Please log in.");
         $window.location.href = "login.html";
@@ -282,7 +265,6 @@
       };
     });
 </script>
-
 </body>
 </html>
 

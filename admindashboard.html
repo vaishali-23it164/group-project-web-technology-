@@ -131,7 +131,6 @@
       text-align: center;
       font-weight: 500;
     }
-
     .fade.ng-enter {
       transition: 0.5s linear all;
       opacity: 0;
@@ -211,7 +210,6 @@
     angular.module('hireSightApp.directives', []);
     angular.module('hireSightApp.controllers', []);
     angular.module('hireSightApp.animations', ['ngAnimate']);
-
     angular.module('hireSightApp', [
       'hireSightApp.services',
       'hireSightApp.directives',
@@ -219,7 +217,6 @@
       'hireSightApp.animations',
       'ngAnimate'
     ]);
-
     angular.module('hireSightApp.services').factory('HiringStatsFactory', function () {
       return {
         getHiringStats: function () {
@@ -227,7 +224,6 @@
         }
       };
     });
-
     angular.module('hireSightApp.services').service('HiringDataService', function () {
       this.getHiringDetails = function () {
         return [
@@ -238,7 +234,6 @@
         ];
       };
     });
-
     angular.module('hireSightApp.directives').directive('highlightCard', function () {
       return {
         restrict: 'A',
@@ -251,7 +246,6 @@
         }
       };
     });
-
     angular.module('hireSightApp.controllers').controller('DashboardController', ['HiringStatsFactory', 'HiringDataService', function(HiringStatsFactory, HiringDataService) {
       const self = this;
       self.hiringDetails = HiringDataService.getHiringDetails();
