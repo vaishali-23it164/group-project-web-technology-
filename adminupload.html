@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireSight - CSV Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; 
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif; 
+            background: #f0f0ff; 
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background: #a490f0; 
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .app-name {
+            font-weight: bold;
+            font-size: 1.5rem; 
+            color: white; 
+        }
+        .nav a {
+            margin-left: 1.5rem; 
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            flex-grow: 1;
+            padding: 2rem; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .card {
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 1.5rem; 
+            font-size: 1.75rem; 
+            border-bottom: 2px solid #e9edfb; 
+            padding-bottom: 0.75rem;
+        }
+        .card p {
+            margin-bottom: 1.5rem; 
+            line-height: 1.5; 
+        }
+        .drag-drop-area {
+            border: 2px dashed #b0b6d1; 
+            border-radius: 8px; 
+            padding: 60px;
+            text-align: center;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            font-size: 1.1rem; 
+            transition: border-color 0.3s ease;
+        }
+        .drag-drop-area:hover {
+            border-color: #a490f0; 
+        }
+        #selectedFileName {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #a490f0; 
+            font-size: 1rem;
+        }
+        .or-separator {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #666;
+            position: relative;
+            z-index: 1;
+            font-size: 1rem;
+        }
+        .or-separator::before,
+        .or-separator::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #ddd;
+            z-index: -1;
+        }
+        .or-separator::before {
+            left: 0;
+        }
+        .or-separator::after {
+            right: 0;
+        }
+        .file-select-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .btn {
+            background-color: #e9edfb; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-weight: 600; 
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn:hover {
+            background-color: #dbe2f8; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn.primary {
+            background-color: #a490f0; 
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15); 
+        }
+        .btn.primary:hover {
+            background-color: #8f7ce0; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        #selectFileBtn { 
+            padding: 25px 50px; 
+            font-size: 1.2rem; 
+            width: 100%; 
+        }
+        .submit-btn { 
+            display: block;
+            margin: 2rem auto 0 auto;
+            padding: 0.6rem 1.2rem; 
+            font-size: 0.95rem;
+            width: fit-content; 
+        }
+        .message {
+            padding: 1rem 1.5rem; 
+            border-radius: 8px; 
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .message .icon {
+            margin-right: 10px;
+            font-size: 1.5rem; 
+        }
+        .message.success {
+            background-color: #e6ffe6;
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+        .message.error {
+            background-color: #ffe6e6;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        #recordDetailsSection {
+            margin-top: 2rem; 
+        }
+        #recordDetailsSection h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+        .user-table { 
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+        .user-table th,
+        .user-table td {
+            border: 1px solid #f0f0ff; 
+            padding: 0.8rem 1rem; 
+            text-align: left;
+        }
+        .user-table th {
+            background-color: #b0b6d1; 
+            color: white;
+            font-weight: 600; 
+        }
+        .user-table tbody tr:nth-child(odd) {
+            background-color: #f8f8ff; 
+        }
+        .user-table tbody tr:hover {
+            background-color: #e9edfb; 
+        }
+
+        .status-active {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-deactivated {
+            color: #ffc107; 
+            font-weight: bold;
+        }
+        .status-failed {
+            color: #dc3545; 
+            font-weight: bold;
+        }
+        .btn-small {
+            padding: 0.4rem 0.8rem; 
+            font-size: 0.8rem;
+            background-color: #a490f0; 
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-small:hover {
+            background-color: #8f7ce0;
+        }
+        .summary-text {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #e0e0e0;
+            font-weight: bold;
+            color: #555;
+            font-size: 1rem;
+        }
+        .footer {
+            background-color: #f0f2f5;
+            padding: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="app-name">HireSight</div>
+        <nav class="nav">
+            <a href="adminhome.html" class="nav-link">Home</a> <a href="login.html" class="nav-link">Logout</a>
+        </nav>
+    </header>
+    <main class="container">
+        <section class="card">
+            <h2>CSV Upload Page</h2>
+            <p>Upload job application data in bulk. Validate headers like Applicant, Position, Status, etc.</p>
+            <div class="drag-drop-area" id="dragDropArea">
+                Drag & Drop CSV File Here
+                <span id="selectedFileName" style="display: none;"></span>
+            </div>
+            <div class="or-separator">OR</div>
+            <div class="file-select-container">
+                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+                <button class="btn primary" id="selectFileBtn">Select File</button>
+            </div>
+            <button class="btn primary submit-btn" id="submitCsvBtn">Submit CSV</button>
+            <div id="messagesSection" style="display: none;">
+                <div class="message success" id="successMessage" style="display: none;">
+                    <span class="icon">✅</span> <span id="successText"></span>
+                </div>
+                <div class="message error" id="errorMessage" style="display: none;">
+                    <span class="icon">❌</span> <span id="errorText"></span>
+                </div>
+            </div>
+            <div id="recordDetailsSection" class="card" style="display: none;">
+                <h3>Processed Record Details</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Applicant Name</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordDetailsBody">
+                        </tbody>
+                </table>
+                <p class="summary-text" id="summaryText"></p>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        © 2025 HireSight. All rights reserved.
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dragDropArea = document.getElementById('dragDropArea');
+            const csvFileInput = document.getElementById('csvFileInput');
+            const selectFileBtn = document.getElementById('selectFileBtn');
+            const selectedFileNameSpan = document.getElementById('selectedFileName');
+            const submitCsvBtn = document.getElementById('submitCsvBtn');
+            const messagesSection = document.getElementById('messagesSection');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const successText = document.getElementById('successText');
+            const errorText = document.getElementById('errorText');
+            const recordDetailsSection = document.getElementById('recordDetailsSection');
+            const recordDetailsBody = document.getElementById('recordDetailsBody');
+            const summaryText = document.getElementById('summaryText');
+            let currentFile = null;
+            selectFileBtn.addEventListener('click', () => {
+                csvFileInput.click(); 
+            });
+            csvFileInput.addEventListener('change', (event) => {
+                handleFileSelection(event.target.files);
+            });
+            dragDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dragDropArea.style.borderColor = '#a490f0'; 
+            });
+            dragDropArea.addEventListener('dragleave', () => {
+                dragDropArea.style.borderColor = '#b0b6d1'; 
+            });
+            dragDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDropArea.style.borderColor = '#b0b6d1'; 
+                handleFileSelection(e.dataTransfer.files);
+            });
+            function handleFileSelection(files) {
+                hideMessagesAndDetails();
+                if (files.length > 0) {
+                    currentFile = files[0];
+                    selectedFileNameSpan.textContent = `Selected: ${currentFile.name}`;
+                    selectedFileNameSpan.style.display = 'block';
+                } else {
+                    currentFile = null;
+                    selectedFileNameSpan.textContent = '';
+                    selectedFileNameSpan.style.display = 'none';
+                }
+            }
+            submitCsvBtn.addEventListener('click', () => {
+                hideMessagesAndDetails(); 
+                if (!currentFile) {
+                    displayError('Please select a CSV file first.');
+                    return;
+                }
+                console.log(`Submitting file: ${currentFile.name}`);
+                const isSuccess = Math.random() > 0.3; 
+                let processedRecords = 0;
+                let failedRecords = 0;
+                const totalRecords = Math.floor(Math.random() * 50) + 10; 
+                if (isSuccess) {
+                    processedRecords = totalRecords - (Math.floor(Math.random() * 5)); 
+                    failedRecords = totalRecords - processedRecords;
+                    displaySuccess(`${processedRecords} records processed successfully.`);
+                } else {
+                    failedRecords = Math.floor(Math.random() * (totalRecords / 2)) + 1; 
+                    processedRecords = totalRecords - failedRecords;
+                    displayError(`${failedRecords} failed due to missing required fields or invalid data.`);
+                }
+                displayRecordDetails(processedRecords, failedRecords);
+            });
+            function hideMessagesAndDetails() {
+                messagesSection.style.display = 'none';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                recordDetailsSection.style.display = 'none';
+                recordDetailsBody.innerHTML = ''; 
+                summaryText.textContent = ''; 
+            }
+            function displaySuccess(message) {
+                messagesSection.style.display = 'block';
+                successMessage.style.display = 'flex';
+                errorMessage.style.display = 'none';
+                successText.textContent = message;
+            }
+            function displayError(message) {
+                messagesSection.style.display = 'block';
+                errorMessage.style.display = 'flex';
+                successMessage.style.display = 'none';
+                errorText.textContent = message;
+            }
+            function displayRecordDetails(processedCount, failedCount) {
+                recordDetailsSection.style.display = 'block';
+                recordDetailsBody.innerHTML = ''; 
+                const sampleRecords = [
+                    { name: "Preethi shri", position: "Marketing Specialist", status: "Active" },
+                    { name: "Vaishali", position: "Construction Manager", status: "Active" },
+                    { name: "Meenakshi", position: "Data Analyst", status: "Deactivated" },
+                    { name: "Sandhiya", position: "Project Lead", status: "Active" },
+                    { name: "Nivetha", position: "HR Generalist", status: "Failed" } 
+                ];
+                sampleRecords.forEach(record => {
+                    const row = recordDetailsBody.insertRow();
+                    row.insertCell(0).textContent = record.name;
+                    row.insertCell(1).textContent = record.position;
+                    const statusCell = row.insertCell(2);
+                    statusCell.innerHTML = `<span class="status-${record.status.toLowerCase()}">${record.status}</span>`;
+                    const actionCell = row.insertCell(3);
+                    actionCell.innerHTML = `<button class="btn-small">View</button>`;
+                });
+                summaryText.textContent = `Summary: ${processedCount} records processed, ${failedCount} records failed. Total ${processedCount + failedCount} attempts.`;
+            }
+        });
+    </script>
+</body>
+</html>
