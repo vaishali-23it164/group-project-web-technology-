@@ -1,12 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="en" ng-app="myApp">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HireSight Dashboard</title>
+
+  <!-- AngularJS & Chart.js -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Animation Styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
   <style>
     body {
       margin: 0;
@@ -118,15 +124,27 @@
     tr:hover {
       background: #f0f4ff;
     }
+
+    /* Animation for rows */
+    .fade-animate.ng-enter {
+      animation: fadeIn 0.8s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body ng-controller="MainController">
   <header class="header">
     <div class="logo">HireSight</div>
     <nav class="nav">
-      <a href="login.html">Logout</a>
+      <a href="#">Dashboard</a>
+      <a href="#">Settings</a>
+      <a href="#">Logout</a>
     </nav>
   </header>
+
   <main class="dashboard">
 
     <!-- Applicant Status Summary -->
@@ -150,28 +168,27 @@
       </div>
     </div>
 
-    <!-- Filters with ng-model -->
+    <!-- Filters -->
     <div class="card">
       <div class="filters">
         <select ng-model="selectedProject">
-          <option>Select Project</option>
+          <option value="">-- Select Project --</option>
           <option>Project Alpha</option>
           <option>Project Beta</option>
         </select>
-       <select ng-model="selectedFilterKey">
-  <option value="">-- Select --</option>
-  <option value="location">Location</option>
-  <option value="experience">Experience</option>
-</select>
 
-<input type="text" ng-model="searchTerm" placeholder="Enter value to search" />
+        <select ng-model="selectedFilterKey">
+          <option value="">-- Select --</option>
+          <option value="location">Location</option>
+          <option value="experience">Experience</option>
+        </select>
 
+        <input type="text" ng-model="searchTerm" placeholder="Enter value to search" />
       </div>
 
-      <!-- Bindings example -->
       <div style="padding: 0 1rem 1rem;">
         <strong>Selected Project:</strong> {{ selectedProject }} <br/>
-        <strong>Filter:</strong> {{ selectedFilter }}
+<strong>Filter:</strong> {{ selectedFilterKey || 'None' }}
       </div>
 
       <table>
@@ -190,61 +207,49 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1001</td>
-            <td>{{ userName }}</td>
-            <td>alice@example.com</td>
-            <td>+1234567890</td>
-            <td>2025-07-01</td>
-            <td>Shortlisted</td>
-            <td>3 yrs</td>
-            <td>HTML, CSS, JS</td>
-            <td>B.Sc CS</td>
-            <td><a href="#">View</a></td>
-          </tr>
-          <tr>
-            <td>1002</td>
-            <td>Bob Johnson</td>
-            <td>bob@example.com</td>
-            <td>+0987654321</td>
-            <td>2025-07-05</td>
-            <td>Interviewed</td>
-            <td>5 yrs</td>
-            <td>React, Node.js</td>
-            <td>MCA</td>
-            <td><a href="#">View</a></td>
-          </tr>
-        </tbody>
+  <tr class="fade-animate" ng-repeat="applicant in applicants | filter:dynamicFilter">
+    <td>{{ applicant.id }}</td>
+    <td>{{ applicant.name | capitalize }}</td>
+    <td>{{ applicant.email }}</td>
+    <td>{{ applicant.phone }}</td>
+    <td>{{ applicant.date }}</td>
+    <td>{{ applicant.status }}</td>
+    <td>{{ applicant.experience }}</td>
+    <td>{{ applicant.skills }}</td>
+    <td>{{ applicant.qualification }}</td>
+    <td><a href="#">View</a></td>
+  </tr>
+</tbody>
+
       </table>
     </div>
+
+    <!-- Directive Example -->
+    <div ng-controller="StatusController" style="padding:1rem;">
+      <h4>Status List from Factory:</h4>
+      <ul>
+        <li ng-repeat="status in statusList">{{ status }}</li>
+      </ul>
+    </div>
+
+    <div style="padding:1rem;">
+      <applicant-card name="Alice Smith" email="alice@example.com"></applicant-card>
+      <applicant-card name="Bob Johnson" email="bob@example.com"></applicant-card>
+    </div>
+
   </main>
 
   <script>
-    const barChart = new Chart(document.getElementById('barChart'), {
+    // Chart.js
+    new Chart(document.getElementById('barChart'), {
       type: 'bar',
       data: {
         labels: ['Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager'],
         datasets: [
-          {
-            label: 'Eligible',
-            data: [12, 19, 7, 5, 3],
-            backgroundColor: '#a78bfa'
-          },
-          {
-            label: 'Not Eligible',
-            data: [4, 6, 2, 3, 1],
-            backgroundColor: '#c4b5fd'
-          },
-          {
-            label: 'Hired',
-            data: [1, 2, 1, 1, 1],
-            backgroundColor: '#8b5cf6'
-          },
-          {
-            label: 'Pending',
-            data: [5, 8, 3, 2, 1],
-            backgroundColor: '#ddd6fe'
-          }
+          { label: 'Eligible', data: [12, 19, 7, 5, 3], backgroundColor: '#a78bfa' },
+          { label: 'Not Eligible', data: [4, 6, 2, 3, 1], backgroundColor: '#c4b5fd' },
+          { label: 'Hired', data: [1, 2, 1, 1, 1], backgroundColor: '#8b5cf6' },
+          { label: 'Pending', data: [5, 8, 3, 2, 1], backgroundColor: '#ddd6fe' }
         ]
       },
       options: {
@@ -252,52 +257,163 @@
         plugins: {
           legend: {
             position: 'top',
-            labels: {
-              color: '#4b2991'
-            }
+            labels: { color: '#4b2991' }
           }
         }
       }
     });
 
-    const pieChart = new Chart(document.getElementById('pieChart'), {
+    new Chart(document.getElementById('pieChart'), {
       type: 'pie',
       data: {
         labels: ['Excellent', 'Good', 'Average', 'Poor'],
         datasets: [
-          {
-            data: [40, 35, 15, 10],
-            backgroundColor: ['#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe']
-          }
+          { data: [40, 35, 15, 10], backgroundColor: ['#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe'] }
         ]
       },
-      options: {
-        responsive: true
-      }
+      options: { responsive: true }
     });
   </script>
 
-  <script>
-    angular.module('myApp', [])
-      .controller('MainController', function($scope) {
-        $scope.selectedProject = "Project Alpha";
-        $scope.selectedFilter = "Experience";
-        $scope.userName = "Alice Smith";
-      });
-  </script>
+ <!-- Angular App Logic -->
 <script>
-  // Define the value to be injected
+  angular.module('chartModule', []);
+  angular.module('myApp', ['chartModule', 'ngAnimate']);
+</script>
+
+<script>
   angular.module('myApp')
     .value('defaultUser', 'Alice Smith');
 
-  // Override or extend the controller to inject the value
   angular.module('myApp')
-    .controller('MainController', ['$scope', 'defaultUser', function($scope, defaultUser) {
-      $scope.selectedProject = "Project Alpha";
-      $scope.selectedFilter = "Experience";
-      $scope.userName = defaultUser; // Injected value
+    .service('ApplicantService', function() {
+      this.getApplicantCount = () => 150;
+    });
+
+  angular.module('myApp')
+    .factory('StatusFactory', function() {
+      return {
+        getStatuses: function() {
+          return ['Shortlisted', 'Interviewed', 'Rejected', 'Pending'];
+        }
+      };
+    });
+
+  angular.module('myApp')
+    .directive('applicantCard', function() {
+      return {
+        restrict: 'E',
+        scope: {
+          name: '@',
+          email: '@'
+        },
+        template: `<div style="padding:10px;border:1px solid #d8b4fe;border-radius:8px;margin-bottom:8px;">
+                    <strong>{{ name }}</strong> - <em>{{ email }}</em>
+                   </div>`
+      };
+    });
+
+  angular.module('myApp')
+    .filter('capitalize', function() {
+      return function(input) {
+        if (!input) return '';
+        return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+      };
+    });
+
+  // 🔹 Updated Controller with built-in injections
+  angular.module('myApp')
+    .controller('MainController', [
+      '$scope', 'defaultUser', '$timeout', '$log', '$http', 'ApplicantService', // 🔹 Added DI
+      function($scope, defaultUser, $timeout, $log, $http, ApplicantService) {
+
+        $scope.selectedProject = "Project Alpha";
+        $scope.selectedFilterKey = "experience";
+$scope.dynamicFilter = function(applicant) {
+  // Project filter
+  if ($scope.selectedProject && $scope.selectedProject !== 'Select Project') {
+    if (applicant.project !== $scope.selectedProject) return false;
+  }
+
+  // Additional filter (experience, location, etc.)
+  if ($scope.selectedFilterKey && $scope.searchTerm) {
+    const key = $scope.selectedFilterKey;
+    const value = $scope.searchTerm.toLowerCase();
+    if (!applicant[key] || applicant[key].toString().toLowerCase().indexOf(value) === -1) {
+      return false;
+    }
+  }
+
+  return true;
+};
+$scope.applicants = [
+  {
+    id: 1001,
+    name: 'Meenakshi',
+    email: 'meena@example.com',
+    phone: '+1234567890',
+    date: '2025-07-01',
+    status: 'Shortlisted',
+    experience: '3 yrs',
+    skills: 'HTML, CSS, JS',
+    qualification: 'B.Sc CS',
+    location: 'Chennai',
+    project: 'Project Alpha'
+  },
+  {
+    id: 1002,
+    name: 'Vaishali',
+    email: 'vaishu@example.com',
+    phone: '+0987654321',
+    date: '2025-07-05',
+    status: 'Interviewed',
+    experience: '5 yrs',
+    skills: 'React, Node.js',
+    qualification: 'MCA',
+    location: 'Bangalore',
+    project: 'Project Beta'
+  }
+  {
+    id: 1003,
+    name: 'Preethi',
+    email: 'preethi@example.com',
+    phone: '+0987654321',
+    date: '2025-07-10',
+    status: 'Interviewed',
+    experience: '4 yrs',
+    skills: 'React, Node.js',
+    qualification: 'MCA',
+    location: 'Theni',
+    project: 'Project Beta'
+  }
+];
+
+
+        // 🔹 Use $timeout to simulate delay in loading username
+        $timeout(function() {
+          $scope.userName = defaultUser;
+        }, 300);
+
+        // 🔹 Use $log to output applicant count from service
+        const count = ApplicantService.getApplicantCount();
+        $log.info("Total applicants (from ApplicantService):", count);
+
+        // 🔹 Placeholder $http usage for future API call
+        /*
+        $http.get('/api/applicants').then(function(response) {
+          console.log("Fetched applicants:", response.data);
+        }).catch(function(error) {
+          $log.error("Error fetching applicants:", error);
+        });
+        */
+      }
+    ]);
+
+  angular.module('myApp')
+    .controller('StatusController', ['$scope', 'StatusFactory', function($scope, StatusFactory) {
+      $scope.statusList = StatusFactory.getStatuses();
     }]);
-</script>
+  </script>
 
 </body>
 </html>
