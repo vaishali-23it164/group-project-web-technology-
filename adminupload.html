@@ -1,38 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="adminUploadApp">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>HireSight - CSV Upload</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', sans-serif; 
-            background: #f0f0ff; 
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f0ff;
             color: #333;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
         .header {
-            background: #a490f0; 
+            background: #a490f0;
             color: white;
             display: flex;
             justify-content: space-between;
-            padding: 1rem 2rem; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .app-name {
             font-weight: bold;
-            font-size: 1.5rem; 
-            color: white; 
+            font-size: 1.5rem;
+            color: white;
         }
         .nav a {
-            margin-left: 1.5rem; 
+            margin-left: 1.5rem;
             color: white;
             text-decoration: none;
             font-weight: 500;
@@ -42,14 +44,14 @@
         }
         .container {
             flex-grow: 1;
-            padding: 2rem; 
+            padding: 2rem;
             display: flex;
             justify-content: center;
             align-items: flex-start;
         }
         .card {
-            background: white; 
-            padding: 2rem; 
+            background: white;
+            padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             width: 100%;
@@ -58,34 +60,34 @@
         h2 {
             color: #333;
             margin-top: 0;
-            margin-bottom: 1.5rem; 
-            font-size: 1.75rem; 
-            border-bottom: 2px solid #e9edfb; 
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            border-bottom: 2px solid #e9edfb;
             padding-bottom: 0.75rem;
         }
         .card p {
-            margin-bottom: 1.5rem; 
-            line-height: 1.5; 
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
         .drag-drop-area {
-            border: 2px dashed #b0b6d1; 
-            border-radius: 8px; 
+            border: 2px dashed #b0b6d1;
+            border-radius: 8px;
             padding: 60px;
             text-align: center;
             color: #666;
             cursor: pointer;
             position: relative;
-            font-size: 1.1rem; 
+            font-size: 1.1rem;
             transition: border-color 0.3s ease;
         }
         .drag-drop-area:hover {
-            border-color: #a490f0; 
+            border-color: #a490f0;
         }
         #selectedFileName {
             display: block;
             margin-top: 15px;
             font-weight: bold;
-            color: #a490f0; 
+            color: #a490f0;
             font-size: 1rem;
         }
         .or-separator {
@@ -118,42 +120,42 @@
             margin-bottom: 2rem;
         }
         .btn {
-            background-color: #e9edfb; 
-            border: none; 
-            border-radius: 5px; 
+            background-color: #e9edfb;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            font-weight: 600; 
+            font-weight: 600;
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
             white-space: nowrap;
         }
         .btn:hover {
-            background-color: #dbe2f8; 
+            background-color: #dbe2f8;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .btn.primary {
-            background-color: #a490f0; 
+            background-color: #a490f0;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15); 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
         .btn.primary:hover {
-            background-color: #8f7ce0; 
+            background-color: #8f7ce0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        #selectFileBtn { 
-            padding: 25px 50px; 
-            font-size: 1.2rem; 
-            width: 100%; 
+        .select-btn {
+            padding: 25px 50px;
+            font-size: 1.2rem;
+            width: 100%;
         }
-        .submit-btn { 
+        .submit-btn {
             display: block;
             margin: 2rem auto 0 auto;
-            padding: 0.6rem 1.2rem; 
+            padding: 0.6rem 1.2rem;
             font-size: 0.95rem;
-            width: fit-content; 
+            width: fit-content;
         }
         .message {
-            padding: 1rem 1.5rem; 
-            border-radius: 8px; 
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
             margin-top: 1.5rem;
             margin-bottom: 1rem;
             display: flex;
@@ -163,7 +165,7 @@
         }
         .message .icon {
             margin-right: 10px;
-            font-size: 1.5rem; 
+            font-size: 1.5rem;
         }
         .message.success {
             background-color: #e6ffe6;
@@ -176,7 +178,7 @@
             border: 1px solid #dc3545;
         }
         #recordDetailsSection {
-            margin-top: 2rem; 
+            margin-top: 2rem;
         }
         #recordDetailsSection h3 {
             margin-top: 0;
@@ -186,7 +188,7 @@
             padding-bottom: 0.5rem;
             font-size: 1.25rem;
         }
-        .user-table { 
+        .user-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
@@ -194,38 +196,37 @@
         }
         .user-table th,
         .user-table td {
-            border: 1px solid #f0f0ff; 
-            padding: 0.8rem 1rem; 
+            border: 1px solid #f0f0ff;
+            padding: 0.8rem 1rem;
             text-align: left;
         }
         .user-table th {
-            background-color: #b0b6d1; 
+            background-color: #b0b6d1;
             color: white;
-            font-weight: 600; 
+            font-weight: 600;
         }
         .user-table tbody tr:nth-child(odd) {
-            background-color: #f8f8ff; 
+            background-color: #f8f8ff;
         }
         .user-table tbody tr:hover {
-            background-color: #e9edfb; 
+            background-color: #e9edfb;
         }
-
         .status-active {
             color: #28a745;
             font-weight: bold;
         }
         .status-deactivated {
-            color: #ffc107; 
+            color: #ffc107;
             font-weight: bold;
         }
         .status-failed {
-            color: #dc3545; 
+            color: #dc3545;
             font-weight: bold;
         }
         .btn-small {
-            padding: 0.4rem 0.8rem; 
+            padding: 0.4rem 0.8rem;
             font-size: 0.8rem;
-            background-color: #a490f0; 
+            background-color: #a490f0;
             color: white;
             border: none;
             border-radius: 4px;
@@ -252,38 +253,54 @@
             border-top: 1px solid #ddd;
             margin-top: auto;
         }
+        .message.ng-enter {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        .message.ng-enter-active {
+            opacity: 1;
+        }
+        .message.ng-leave {
+            opacity: 1;
+        }
+        .message.ng-leave-active {
+            opacity: 0;
+        }
     </style>
 </head>
-<body>
+<body ng-controller="CsvController as vm">
     <header class="header">
         <div class="app-name">HireSight</div>
         <nav class="nav">
-            <a href="adminhome.html" class="nav-link">Home</a> <a href="login.html" class="nav-link">Logout</a>
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link">Logout</a>
         </nav>
     </header>
+
     <main class="container">
         <section class="card">
             <h2>CSV Upload Page</h2>
-            <p>Upload job application data in bulk. Validate headers like Applicant, Position, Status, etc.</p>
-            <div class="drag-drop-area" id="dragDropArea">
+            <p>Upload job application data in bulk.</p>
+
+            <div drag-drop class="drag-drop-area">
                 Drag & Drop CSV File Here
-                <span id="selectedFileName" style="display: none;"></span>
+                <span id="selectedFileName" ng-show="vm.fileName">Selected: {{vm.fileName}}</span>
             </div>
+
             <div class="or-separator">OR</div>
+
             <div class="file-select-container">
-                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-                <button class="btn primary" id="selectFileBtn">Select File</button>
+                <input type="file" id="csvInput" file-input="vm.handleFile(files)" style="display:none;" accept=".csv" />
+                <button class="btn primary select-btn" ng-click="vm.selectFile()">Select File</button>
             </div>
-            <button class="btn primary submit-btn" id="submitCsvBtn">Submit CSV</button>
-            <div id="messagesSection" style="display: none;">
-                <div class="message success" id="successMessage" style="display: none;">
-                    <span class="icon">✅</span> <span id="successText"></span>
-                </div>
-                <div class="message error" id="errorMessage" style="display: none;">
-                    <span class="icon">❌</span> <span id="errorText"></span>
-                </div>
+
+            <button class="btn primary submit-btn" ng-click="vm.submitCsv()">Submit CSV</button>
+
+            <div ng-if="vm.message" class="message" ng-class="{'success': vm.isSuccess, 'error': !vm.isSuccess}">
+                <span class="icon">{{ vm.isSuccess ? '✅' : '❌' }}</span>&nbsp;{{ vm.message }}
             </div>
-            <div id="recordDetailsSection" class="card" style="display: none;">
+
+            <div ng-show="vm.candidates.length > 0" id="recordDetailsSection">
                 <h3>Processed Record Details</h3>
                 <table class="user-table">
                     <thead>
@@ -294,125 +311,144 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="recordDetailsBody">
-                        </tbody>
+                    <tbody>
+                        <tr ng-repeat="c in vm.candidates">
+                            <td>{{ c.name }}</td>
+                            <td>{{ c.position }}</td>
+                            <td><span ng-class="vm.getStatusClass(c.status)">{{ c.status }}</span></td>
+                            <td><button class="btn-small">View</button></td>
+                        </tr>
+                    </tbody>
                 </table>
-                <p class="summary-text" id="summaryText"></p>
+                <p class="summary-text"><strong>Summary:</strong> Total {{ vm.candidates.length }} records processed.</p>
             </div>
         </section>
     </main>
+
     <footer class="footer">
         © 2025 HireSight. All rights reserved.
     </footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dragDropArea = document.getElementById('dragDropArea');
-            const csvFileInput = document.getElementById('csvFileInput');
-            const selectFileBtn = document.getElementById('selectFileBtn');
-            const selectedFileNameSpan = document.getElementById('selectedFileName');
-            const submitCsvBtn = document.getElementById('submitCsvBtn');
-            const messagesSection = document.getElementById('messagesSection');
-            const successMessage = document.getElementById('successMessage');
-            const errorMessage = document.getElementById('errorMessage');
-            const successText = document.getElementById('successText');
-            const errorText = document.getElementById('errorText');
-            const recordDetailsSection = document.getElementById('recordDetailsSection');
-            const recordDetailsBody = document.getElementById('recordDetailsBody');
-            const summaryText = document.getElementById('summaryText');
-            let currentFile = null;
-            selectFileBtn.addEventListener('click', () => {
-                csvFileInput.click(); 
-            });
-            csvFileInput.addEventListener('change', (event) => {
-                handleFileSelection(event.target.files);
-            });
-            dragDropArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dragDropArea.style.borderColor = '#a490f0'; 
-            });
-            dragDropArea.addEventListener('dragleave', () => {
-                dragDropArea.style.borderColor = '#b0b6d1'; 
-            });
-            dragDropArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dragDropArea.style.borderColor = '#b0b6d1'; 
-                handleFileSelection(e.dataTransfer.files);
-            });
-            function handleFileSelection(files) {
-                hideMessagesAndDetails();
-                if (files.length > 0) {
-                    currentFile = files[0];
-                    selectedFileNameSpan.textContent = `Selected: ${currentFile.name}`;
-                    selectedFileNameSpan.style.display = 'block';
-                } else {
-                    currentFile = null;
-                    selectedFileNameSpan.textContent = '';
-                    selectedFileNameSpan.style.display = 'none';
+        const app = angular.module('adminUploadApp', ['ngAnimate']);
+
+        app.controller('CsvController', ['$scope', 'CsvService', '$timeout', 'StatusFactory',
+            function ($scope, CsvService, $timeout, StatusFactory) {
+                var vm = this;
+                vm.candidates = [];
+                vm.isSuccess = false;
+                vm.message = "";
+                vm.fileName = "";
+                vm.currentFile = null;
+
+                vm.selectFile = () => document.getElementById("csvInput").click();
+
+                vm.handleFile = function(files) {
+                    if (files.length > 0) {
+                        $scope.$apply(() => {
+                            vm.currentFile = files[0];
+                            vm.fileName = files[0].name;
+                            vm.message = "";
+                            vm.candidates = [];
+                        });
+                    }
+                };
+
+                vm.submitCsv = function () {
+                    if (!vm.currentFile) {
+                        vm.message = "Please select a CSV file first.";
+                        vm.isSuccess = false;
+                        return;
+                    }
+
+                    CsvService.processCsv(vm.currentFile, function (result) {
+                        vm.candidates = result;
+                        vm.isSuccess = true;
+                        vm.message = "Upload completed successfully.";
+                        $scope.$apply();
+
+                        $timeout(function() {
+                            vm.message = "";
+                        }, 5000);
+                    }, function (error) {
+                        vm.isSuccess = false;
+                        vm.message = "There were errors during upload: " + error.message;
+                        $scope.$apply();
+                    });
+                };
+
+                vm.getStatusClass = function (status) {
+                    return StatusFactory.statusClasses[status] || '';
+                };
+
+                // Expose handleFile to the scope for drag-drop directive
+                $scope.handleFile = vm.handleFile;
+            }
+        ]);
+
+        app.service('CsvService', function () {
+            this.processCsv = function (file, successCallback, errorCallback) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Simulate processing and parsing of the CSV file
+                    // In a real application, you would parse e.target.result
+                    const mockData = [
+                        { name: "Preethi shri", position: "Marketing Specialist", status: "Active" },
+                        { name: "Vaishali", position: "Construction Manager", status: "Active" },
+                        { name: "Meenakshi", position: "Data Analyst", status: "Deactivated" },
+                        { name: "Sandhiya", position: "Project Lead", status: "Active" },
+                        { name: "Nivetha", position: "HR Generalist", status: "Failed" }
+                    ];
+                    successCallback(mockData);
+                };
+                reader.onerror = function (e) {
+                    errorCallback({ message: "File reading failed." });
+                };
+                reader.readAsText(file);
+            };
+        });
+
+        app.factory('StatusFactory', function () {
+            return {
+                statusClasses: {
+                    Active: 'status-active',
+                    Deactivated: 'status-deactivated',
+                    Failed: 'status-failed'
                 }
-            }
-            submitCsvBtn.addEventListener('click', () => {
-                hideMessagesAndDetails(); 
-                if (!currentFile) {
-                    displayError('Please select a CSV file first.');
-                    return;
+            };
+        });
+
+        app.directive("dragDrop", function () {
+            return {
+                restrict: "A",
+                link: function (scope, element) {
+                    element.on("dragover", function (e) {
+                        e.preventDefault();
+                        element.css("border-color", "#a490f0");
+                    });
+                    element.on("dragleave", function () {
+                        element.css("border-color", "#b0b6d1");
+                    });
+                    element.on("drop", function (e) {
+                        e.preventDefault();
+                        element.css("border-color", "#b0b6d1");
+                        scope.handleFile(e.originalEvent.dataTransfer.files);
+                    });
                 }
-                console.log(`Submitting file: ${currentFile.name}`);
-                const isSuccess = Math.random() > 0.3; 
-                let processedRecords = 0;
-                let failedRecords = 0;
-                const totalRecords = Math.floor(Math.random() * 50) + 10; 
-                if (isSuccess) {
-                    processedRecords = totalRecords - (Math.floor(Math.random() * 5)); 
-                    failedRecords = totalRecords - processedRecords;
-                    displaySuccess(`${processedRecords} records processed successfully.`);
-                } else {
-                    failedRecords = Math.floor(Math.random() * (totalRecords / 2)) + 1; 
-                    processedRecords = totalRecords - failedRecords;
-                    displayError(`${failedRecords} failed due to missing required fields or invalid data.`);
+            };
+        });
+
+        app.directive("fileInput", function () {
+            return {
+                scope: {
+                    fileInput: "&"
+                },
+                link: function (scope, element) {
+                    element.bind("change", function () {
+                        scope.fileInput({ files: element[0].files });
+                    });
                 }
-                displayRecordDetails(processedRecords, failedRecords);
-            });
-            function hideMessagesAndDetails() {
-                messagesSection.style.display = 'none';
-                successMessage.style.display = 'none';
-                errorMessage.style.display = 'none';
-                recordDetailsSection.style.display = 'none';
-                recordDetailsBody.innerHTML = ''; 
-                summaryText.textContent = ''; 
-            }
-            function displaySuccess(message) {
-                messagesSection.style.display = 'block';
-                successMessage.style.display = 'flex';
-                errorMessage.style.display = 'none';
-                successText.textContent = message;
-            }
-            function displayError(message) {
-                messagesSection.style.display = 'block';
-                errorMessage.style.display = 'flex';
-                successMessage.style.display = 'none';
-                errorText.textContent = message;
-            }
-            function displayRecordDetails(processedCount, failedCount) {
-                recordDetailsSection.style.display = 'block';
-                recordDetailsBody.innerHTML = ''; 
-                const sampleRecords = [
-                    { name: "Preethi shri", position: "Marketing Specialist", status: "Active" },
-                    { name: "Vaishali", position: "Construction Manager", status: "Active" },
-                    { name: "Meenakshi", position: "Data Analyst", status: "Deactivated" },
-                    { name: "Sandhiya", position: "Project Lead", status: "Active" },
-                    { name: "Nivetha", position: "HR Generalist", status: "Failed" } 
-                ];
-                sampleRecords.forEach(record => {
-                    const row = recordDetailsBody.insertRow();
-                    row.insertCell(0).textContent = record.name;
-                    row.insertCell(1).textContent = record.position;
-                    const statusCell = row.insertCell(2);
-                    statusCell.innerHTML = `<span class="status-${record.status.toLowerCase()}">${record.status}</span>`;
-                    const actionCell = row.insertCell(3);
-                    actionCell.innerHTML = `<button class="btn-small">View</button>`;
-                });
-                summaryText.textContent = `Summary: ${processedCount} records processed, ${failedCount} records failed. Total ${processedCount + failedCount} attempts.`;
-            }
+            };
         });
     </script>
 </body>
