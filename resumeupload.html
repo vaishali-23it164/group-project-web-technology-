@@ -1,203 +1,271 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="hireSightApp">
+<html ng-app="hireSightApp">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HireSight</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-animate.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f7f8fc;
-    }
+    <meta charset="utf-8">
+    <title>Resume AI Helper</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f7f8fc;
+        }
 
-    header {
-      background: linear-gradient(to right, #7b5fe8, #8a6ff1);
-      color: white;
-      padding: 15px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        header {
+            background: #a490f0;
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
 
-    header nav a {
-      color: white;
-      margin-left: 20px;
-      text-decoration: none;
-      font-size: 14px;
-    }
+        header nav a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
-    main {
-      padding: 30px 40px;
-    }
+        main {
+            padding: 30px 40px;
+        }
 
-    .upload-box, .tips-box, .fixes-box {
-      background: white;
-      border-radius: 10px;
-      padding: 20px 25px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
+        .upload-box, .tips-box, .fixes-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
 
-    .upload-box h2,
-    .tips-box h3,
-    .fixes-box h3 {
-      color: #5728e1;
-      margin-top: 0;
-    }
+        .upload-box h2,
+        .tips-box h3,
+        .fixes-box h3 {
+            color: #5728e1;
+            margin-top: 0;
+        }
 
-    .file-drop-area {
-      border: 2px dashed #ccc;
-      padding: 30px;
-      margin-top: 15px;
-      text-align: center;
-      border-radius: 8px;
-    }
+        .file-drop-area {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            margin-top: 15px;
+            text-align: center;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
 
-    .file-drop-area button {
-      background-color: #00cfcf;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+        .file-drop-area.dragover {
+            background: #e0f7fa;
+            border-color: #00acc1;
+        }
 
-    ul {
-      margin: 0;
-      padding-left: 20px;
-    }
+        .file-drop-area button {
+            background-color: #00cfcf;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .upload-box p {
+            margin-bottom: 15px;
+        }
+        
+        #fileName {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #5728e1;
+        }
 
-    ul li {
-      margin-bottom: 8px;
-    }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
 
-    #beforeText, #afterText {
-      background-color: #f1f3f9;
-      padding: 10px;
-      border-radius: 6px;
-      margin: 8px 0;
-      white-space: pre-wrap;
-    }
+        ul li {
+            margin-bottom: 8px;
+        }
 
-    .fade {
-      transition: opacity 0.5s;
-    }
-    .ng-hide {
-      opacity: 0;
-    }
-  </style>
+        #beforeText, #afterText {
+            background-color: #f1f3f9;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+            white-space: pre-wrap;
+        }
+
+        .fade {
+            transition: opacity 0.5s;
+        }
+        .ng-hide {
+            opacity: 0;
+        }
+        
+        /* New styling for the larger button */
+        .get-fixes-btn {
+            display: block;
+            margin: 20px auto 0;
+            background: #a490f0;
+            color: white;
+            border: none;
+            padding: 15px 30px; /* Larger padding for a bigger button */
+            font-size: 16px; /* Larger font size */
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .get-fixes-btn:hover {
+            background: #8f7ce0;
+        }
+    </style>
 </head>
 <body ng-controller="ResumeController">
 
-  <header>
+<header>
     <h1>HireSight</h1>
     <nav>
-      <a href="#">Home</a>
-      <a href="#">Resume Suggester</a>
+        <a href="#">Home</a>
+        <a href="#">Resume Suggester</a>
     </nav>
-  </header>
+</header>
 
-  <main>
+<main>
     <section class="upload-box">
-      <h2>📄 Upload Your Resume</h2>
-      <p>Drop your resume here (PDF or Word) and we’ll give you tailored improvement tips instantly.</p>
-      <div class="file-drop-area" file-drop-area>
-        <input type="file" id="resumeInput" accept=".pdf,.doc,.docx" hidden 
-               onchange="angular.element(this).scope().handleFileChange(this.files)" />
-        <button ng-click="triggerFileInput()">Select File</button>
-      </div>
+        <h2>📄 Upload Your Resume</h2>
+        <p>Drop your resume here (PDF or Word) and we’ll give you tailored improvement tips instantly.</p>
+        <div class="file-drop-area" file-drop-area>
+            <p>Drag & Drop Resume Here</p>
+            <p>OR</p>
+            <input type="file" id="resumeInput" file-model="resumeFile" accept=".pdf,.doc,.docx" hidden />
+            <button ng-click="triggerFileInput()">Select File</button>
+            <p id="fileName" ng-if="resumeFile">Selected: {{ resumeFile.name }}</p>
+        </div>
+        <button ng-click="submitResume()" class="get-fixes-btn">Get Fixes</button>
     </section>
 
     <section class="tips-box">
-      <h3>✅ Quick Resume Tips</h3>
-      <ul>
-        <li ng-repeat="tip in tips | uppercaseFirst">{{ tip }}</li>
-      </ul>
+        <h3>✅ Quick Resume Tips</h3>
+        <ul>
+            <li ng-repeat="tip in tips | uppercaseFirst">{{ tip }}</li>
+        </ul>
     </section>
 
-    <section class="fixes-box" ng-show="showFixes" class="fade">
-      <h3>Resume Fixes</h3>
-      <p><strong>Before:</strong></p>
-      <p id="beforeText">{{ beforeText }}</p>
-      <p><strong>After:</strong></p>
-      <p id="afterText">{{ afterText }}</p>
+    <section class="fixes-box" ng-show="showFixes">
+        <h3>🚀 Suggested Fixes:</h3>
+        <ul>
+            <li ng-repeat="fix in fixes">{{ fix }}</li>
+        </ul>
     </section>
-  </main>
+</main>
 
-  <script>
-    // Define the AngularJS module
+<script>
+    // MODULE
     var app = angular.module('hireSightApp', ['ngAnimate']);
 
-    // Factory to manage resume tips
-    app.factory('ResumeFactory', function() {
-      return {
-        getTips: function() {
-          return [
-            "keep it to 1–2 pages depending on experience.",
-            "use bullet points instead of paragraphs.",
-            "tailor your resume for each job application.",
-            "highlight key skills in a dedicated section.",
-            "avoid using personal pronouns (I, me, my)."
-          ];
-        }
-      };
+    // DIRECTIVE (Drag-and-drop area)
+    app.directive('fileDropArea', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element) {
+                element.on('dragover', function (e) {
+                    e.preventDefault();
+                    element.addClass('dragover');
+                });
+                element.on('dragleave', function () {
+                    element.removeClass('dragover');
+                });
+                element.on('drop', function (e) {
+                    e.preventDefault();
+                    element.removeClass('dragover');
+                    var file = e.originalEvent ? e.originalEvent.dataTransfer.files[0] : e.dataTransfer.files[0];
+                    scope.resumeFile = file;
+                    scope.$apply();
+                });
+            }
+        };
     });
 
-    // Controller with dependency injection
-    app.controller('ResumeController', ['$scope', 'ResumeFactory', function ($scope, ResumeFactory) {
-      $scope.tips = ResumeFactory.getTips();
+    // FILE MODEL (for input[type="file"])
+    app.directive('fileModel', ['$parse', function ($parse) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                var model = $parse(attrs.fileModel);
+                var modelSetter = model.assign;
 
-      $scope.beforeText = "";
-      $scope.afterText = "";
-      $scope.showFixes = false;
-
-      $scope.triggerFileInput = function () {
-        document.getElementById('resumeInput').click();
-      };
-
-      $scope.handleFileChange = function (files) {
-        const file = files[0];
-        if (file) {
-          const fileName = file.name;
-          $scope.beforeText = `Resume: ${fileName}\n• I am a hardworking individual.\n• I did my internship in XYZ.\n• Seeking job opportunities.`;
-          $scope.afterText = `• Proven track record of delivering results during internship at XYZ Pvt Ltd.\n• Demonstrated strong work ethic and project management skills.\n• Actively seeking roles in Software Development with growth potential.`;
-          $scope.showFixes = true;
-          $scope.$apply(); // update bindings after file load
-        }
-      };
+                element.bind('change', function () {
+                    scope.$apply(function () {
+                        modelSetter(scope, element[0].files[0]);
+                    });
+                });
+            }
+        };
     }]);
 
-    // Filter to capitalize the first letter of each tip
+    // FILTER
     app.filter('uppercaseFirst', function () {
-      return function (items) {
-        return items.map(item => item.charAt(0).toUpperCase() + item.slice(1));
-      };
+        return function (items) {
+            if (!angular.isArray(items)) return items;
+            return items.map(function (item) {
+                return item.charAt(0).toUpperCase() + item.slice(1);
+            });
+        };
     });
 
-    // Directive for file drop area
-    app.directive('fileDropArea', function() {
-      return {
-        restrict: 'A',
-        link: function(scope, element) {
-          element.bind('dragover', function(event) {
-            event.preventDefault();
-          });
-          element.bind('drop', function(event) {
-            event.preventDefault();
-            scope.handleFileChange(event.dataTransfer.files);
-          });
-        }
-      };
+    // FACTORY (data provider)
+    app.factory('ResumeFactory', function () {
+        return {
+            getTips: function () {
+                return [
+                    "use a professional email address",
+                    "tailor resume to each job",
+                    "quantify achievements"
+                ];
+            }
+        };
     });
-  </script>
+
+    // SERVICE (resume processor)
+    app.service('ResumeService', function () {
+        this.getFixes = function (file) {
+            if (!file) return ['No resume uploaded.'];
+            return ['Add more keywords', 'Fix grammar errors', 'Use consistent formatting'];
+        };
+    });
+
+    // CONTROLLER
+    app.controller('ResumeController', ['$scope', 'ResumeFactory', 'ResumeService', function ($scope, ResumeFactory, ResumeService) {
+        $scope.resumeFile = null;
+        $scope.tips = ResumeFactory.getTips();
+        $scope.fixes = [];
+        $scope.showFixes = false;
+
+        $scope.triggerFileInput = function () {
+            document.getElementById('resumeInput').click();
+        };
+
+        $scope.submitResume = function () {
+            if ($scope.resumeFile) {
+                $scope.fixes = ResumeService.getFixes($scope.resumeFile);
+                $scope.showFixes = true;
+            } else {
+                alert('Please upload your resume first.');
+            }
+        };
+    }]);
+</script>
+
 </body>
 </html>
