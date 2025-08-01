@@ -214,15 +214,11 @@
           <option value="jobseeker">{{'jobseeker' | capitalize}}</option>
           <option value="hr">{{'hr' | capitalize}}</option>
         </select>
-
         <input type="email" id="loginEmail" placeholder="you@example.com" ng-model="user.email" email-checker required />
         <span class="error" ng-show="loginForm.loginEmail.$error.emailTaken">Email already exists</span>
-
-        <input type="password" id="loginPassword" placeholder="Password" ng-model="user.password" required />
-        
+        <input type="password" id="loginPassword" placeholder="Password" ng-model="user.password" required /> 
         <button type="submit" ng-disabled="loginForm.$invalid">Login</button>
       </form>
-
       <div class="or">or continue with</div>
       <div class="socials">
         <button><i class="fab fa-google"></i> Google</button>
@@ -230,21 +226,14 @@
       </div>
     </div>
   </div>
-
   <footer>© 2025 HireSight. All rights reserved.</footer>
-
-  <!-- AngularJS Libraries -->
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
-
-  <!-- AngularJS App Script -->
   <script>
     angular.module('hireSightApp', ['ngAnimate'])
-
     .controller('LoginController', ['$scope', '$window', 'AuthService', function ($scope, $window, AuthService) {
       $scope.user = { role: '', email: '', password: '' };
       $scope.showLoginBox = true;
-
       $scope.login = function () {
         const match = AuthService.login($scope.user);
         if (match) {
@@ -261,7 +250,6 @@
         }
       };
     }])
-
     .factory('AuthService', function () {
       return {
         login: function (user) {
@@ -274,16 +262,15 @@
         }
       };
     })
-
     .filter('capitalize', function () {
       return function (input) {
         return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
       };
     })
-
     .directive('emailChecker', function () {
       return {
         restrict: 'A',
+        
         require: 'ngModel',
         link: function (scope, element, attrs, ngModel) {
           ngModel.$parsers.push(function (value) {

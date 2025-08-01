@@ -200,11 +200,9 @@
     .controller('RegisterController', ['$scope', '$window', function($scope, $window) {
       $scope.user = {};
       $scope.errors = {};
-
       $scope.register = function () {
         $scope.errors = {};
         let valid = true;
-
         if (!$scope.user.role) {
           $scope.errors.role = "Please select a user type.";
           valid = false;
@@ -267,5 +265,3 @@
 </script>
 </body>
 </html>
-
-

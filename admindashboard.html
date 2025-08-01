@@ -256,7 +256,6 @@
       self.pending = stats.pending;
       self.ongoingCount = self.hiringDetails.filter(d => d.pending > 0).length;
       self.completedCount = self.hiringDetails.filter(d => d.pending === 0).length;
-
       setTimeout(() => {
         const ctxLine = document.getElementById('lineChart').getContext('2d');
         new Chart(ctxLine, {
@@ -277,7 +276,6 @@
             scales: { y: { beginAtZero: true } }
           }
         });
-
         const ctxBar = document.getElementById('barChart').getContext('2d');
         new Chart(ctxBar, {
           type: 'bar',
