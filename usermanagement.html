@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="hireSightApp" ng-controller="UserController as uc">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HireSight - User Management</title>
+
+    <!-- a) Include AngularJS + Animations -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+
     <style>
         /* Universal Reset for consistent rendering */
         * {
@@ -12,36 +17,32 @@
             box-sizing: border-box;
         }
 
-        /* Applying UI color background from the dashboard code */
         body {
-            font-family: 'Segoe UI', sans-serif; /* Font from dashboard */
-            background: #f0f0ff; /* Light purple background from dashboard */
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f0ff;
             color: #333;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Header styles from dashboard */
         .header {
-            background: #a490f0; /* Header color from dashboard */
+            background: #a490f0;
             color: white;
             display: flex;
             justify-content: space-between;
-            padding: 1rem 2rem; /* Padding from dashboard */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Added subtle shadow */
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* App name/Logo style from dashboard */
         .app-name {
             font-weight: bold;
-            font-size: 1.5rem; /* Logo size from dashboard */
-            color: white; /* Text color for logo */
+            font-size: 1.5rem;
+            color: white;
         }
 
-        /* Nav links style from dashboard */
         .nav a {
-            margin-left: 1.5rem; /* Margin from dashboard */
+            margin-left: 1.5rem;
             color: white;
             text-decoration: none;
             font-weight: 500;
@@ -53,74 +54,73 @@
 
         .container {
             flex-grow: 1;
-            padding: 2rem; /* Padding from dashboard main */
+            padding: 2rem;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align content to the top */
+            align-items: flex-start;
         }
 
         .card {
-            background: white; /* Card background from dashboard */
-            padding: 2rem; /* Adjusted padding for content */
+            background: white;
+            padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Shadow from dashboard card */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 900px; /* Set max-width for consistency */
+            max-width: 900px;
         }
 
         h2 {
             color: #333;
             margin-top: 0;
-            margin-bottom: 1.5rem; /* Consistent margin */
-            font-size: 1.75rem; /* Larger heading */
-            border-bottom: 2px solid #e9edfb; /* Lighter border for heading */
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            border-bottom: 2px solid #e9edfb;
             padding-bottom: 0.75rem;
         }
 
         .card p {
-            margin-bottom: 1.5rem; /* Consistent spacing below paragraphs in cards */
-            line-height: 1.5; /* Improve readability */
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
         }
 
-        /* User Management specific styles - Adjusted to new UI theme */
         .button-group {
-            margin-bottom: 2rem; /* Increased space below buttons */
+            margin-bottom: 2rem;
             display: flex;
-            gap: 0.75rem; /* Consistent gap between buttons */
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
 
         .btn {
-            background-color: #e9edfb; /* Light background for default button from dashboard */
+            background-color: #e9edfb;
             color: #333;
-            border: none; /* No border for default button */
-            padding: 0.75rem 1.5rem; /* Consistent padding */
-            border-radius: 5px; /* Rounded corners from dashboard buttons */
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
             cursor: pointer;
-            font-weight: 600; /* Bolder font */
+            font-weight: 600;
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
             white-space: nowrap;
             font-size: 1rem;
         }
 
         .btn:hover {
-            background-color: #dbe2f8; /* Darker hover for light button */
+            background-color: #dbe2f8;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn.primary {
-            background-color: #a490f0; /* Primary color from dashboard theme */
+            background-color: #a490f0;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* Stronger shadow */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .btn.primary:hover {
-            background-color: #8f7ce0; /* Darker hover for primary button */
+            background-color: #8f7ce0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn.deactivate {
-            background-color: #ff6b6b; /* Softer red from dashboard elements */
+            background-color: #ff6b6b;
             color: white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
@@ -132,10 +132,10 @@
 
         .search-bar input {
             width: 100%;
-            padding: 0.75rem 1rem; /* Consistent padding */
-            border: 1px solid #b0b6d1; /* Border color inspired by dashboard */
+            padding: 0.75rem 1rem;
+            border: 1px solid #b0b6d1;
             border-radius: 5px;
-            margin-bottom: 2rem; /* Increased space below search bar */
+            margin-bottom: 2rem;
             box-sizing: border-box;
             font-size: 1rem;
         }
@@ -149,36 +149,37 @@
 
         .user-table th,
         .user-table td {
-            border: 1px solid #f0f0ff; /* Lighter border for cells */
-            padding: 0.8rem 1rem; /* Adjusted padding */
+            border: 1px solid #f0f0ff;
+            padding: 0.8rem 1rem;
             text-align: left;
         }
 
         .user-table th {
-            background-color: #b0b6d1; /* Header color from dashboard elements */
+            background-color: #b0b6d1;
             color: white;
-            font-weight: 600; /* Bolder header font */
+            font-weight: 600;
         }
 
         .user-table tbody tr:nth-child(odd) {
-            background-color: #f8f8ff; /* Slightly different background for odd rows */
+            background-color: #f8f8ff;
         }
 
         .user-table tbody tr:hover {
-            background-color: #e9edfb; /* Hover color from dashboard list items */
+            background-color: #e9edfb;
         }
 
-        /* Status styling for table cells */
         .status-active {
-            color: #28a745; /* Green */
+            color: #28a745;
             font-weight: bold;
         }
+
         .status-deactivated {
-            color: #ffc107; /* Orange/Yellow */
+            color: #ffc107;
             font-weight: bold;
         }
+
         .status-pending {
-            color: #007bff; /* Blue */
+            color: #007bff;
             font-weight: bold;
         }
 
@@ -191,13 +192,25 @@
             border-top: 1px solid #ddd;
             margin-top: auto;
         }
+
+        /* g) Animation via ngAnimate */
+        .fade.ng-enter {
+            transition: 0.3s ease-in;
+            opacity: 0;
+        }
+
+        .fade.ng-enter-active {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="app-name">HireSight</div>
         <nav class="nav">
-            <a href="adminhome.html" class="nav-link">Home</a> <a href="login.html" class="nav-link">Logout</a>
+            <a href="admin_home_page.html" class="nav-link">Home</a>
+            <a href="#" class="nav-link">Login</a>
+            <a href="#" class="nav-link">Register</a>
         </nav>
     </header>
 
@@ -205,15 +218,19 @@
         <section class="card">
             <h2>User Management</h2>
             <p>Create, edit, and manage user access for the HireSight platform. Assign roles, reset passwords, and manage accounts easily.</p>
+<div ng-if="successMessage" style="margin-bottom: 1rem; padding: 1rem; background: #d4edda; color: #155724; border-radius: 5px;">
+    {{ successMessage }}
+</div>
+
             <div class="button-group">
-                <button class="btn primary">Add User</button>
-                <button class="btn primary">Edit User</button>
-                <button class="btn primary">Delete Selected</button>
-                <button class="btn primary">Reset Password</button>
-                <button class="btn deactivate">Deactivate</button>
+                <button class="btn primary" ng-click="alert('Add User')">Add User</button>
+                <button class="btn primary" ng-click="alert('Edit User')">Edit User</button>
+                <button class="btn primary" ng-click="alert('Delete Selected')">Delete Selected</button>
+                <button class="btn primary" ng-click="alert('Reset Password')">Reset Password</button>
+                <button class="btn deactivate" ng-click="alert('Deactivate')">Deactivate</button>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="Search users by name, email, or role...">
+                <input type="text" placeholder="Search users by name, email, or role..." ng-model="searchQuery">
             </div>
             <table class="user-table">
                 <thead>
@@ -225,35 +242,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Vaishali</td>
-                        <td>vaishali@example.com</td>
-                        <td>Admin</td>
-                        <td><span class="status-active">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>Preethi</td>
-                        <td>preethi@example.com</td>
-                        <td>Recruiter</td>
-                        <td><span class="status-deactivated">Deactivated</span></td>
-                    </tr>
-                    <tr>
-                        <td>Meenakshi</td>
-                        <td>meenakshi@example.com</td>
-                        <td>Job Seeker</td>
-                        <td><span class="status-active">Active</span></td>
-                    </tr>
-                    <tr>
-                        <td>Anand</td>
-                        <td>anand@example.com</td>
-                        <td>Job Seeker</td>
-                        <td><span class="status-pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                        <td>Bharath</td>
-                        <td>bharath@example.com</td>
-                        <td>Interviewer</td>
-                        <td><span class="status-active">Active</span></td>
+                    <tr ng-repeat="user in users | filter:searchQuery" class="fade">
+                        <td>{{ user.name | capitalize }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>
+                            <span
+                                ng-class="{
+                                    'status-active': user.status === 'active',
+                                    'status-deactivated': user.status === 'deactivated',
+                                    'status-pending': user.status === 'pending'
+                                }"
+                                status-highlight="{{ user.status }}">
+                                {{ formatStatus(user.status) }}
+                            </span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -264,16 +267,73 @@
         © 2025 HireSight. All rights reserved.
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Placeholder for User Management buttons
-            const userManagementButtons = document.querySelectorAll('.button-group .btn');
-            userManagementButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    alert(`"${button.textContent}" clicked! (Actual functionality requires backend)`);
-                });
+<script>
+    angular.module('hireSightApp', ['ngAnimate'])
+
+    .service('StatusService', function () {
+        this.getFormattedStatus = function (status) {
+            return status.charAt(0).toUpperCase() + status.slice(1);
+        };
+    })
+
+    .factory('RoleFactory', function () {
+        return {
+            roles: ['Admin', 'Recruiter', 'Job Seeker', 'Interviewer']
+        };
+    })
+
+    .directive('statusHighlight', function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                if (attrs.statusHighlight.toLowerCase() === 'active') {
+                    element.css('font-weight', 'bold');
+                    element.css('color', '#28a745');
+                }
+            }
+        };
+    })
+
+    .filter('capitalize', function () {
+        return function (input) {
+            return input ? input.charAt(0).toUpperCase() + input.slice(1).toLowerCase() : '';
+        };
+    })
+
+    .controller('UserController', function ($scope, $http, $timeout, $log, StatusService, RoleFactory) {
+        $scope.users = [];
+        $scope.roles = RoleFactory.roles;
+        $scope.successMessage = "";
+
+        // Simulated $http GET call (you can replace with real API)
+        $http.get('https://jsonplaceholder.typicode.com/users') // Dummy API
+            .then(function(response) {
+                // Use dummy API to simulate some data
+                $scope.users = [
+                    { name: 'Vaishali', email: 'vaishali@example.com', role: 'Admin', status: 'active' },
+                    { name: 'Preethi', email: 'preethi@example.com', role: 'Recruiter', status: 'deactivated' },
+                    { name: 'Meenakshi', email: 'meenakshi@example.com', role: 'Job Seeker', status: 'active' },
+                    { name: 'Anand', email: 'anand@example.com', role: 'Job Seeker', status: 'pending' },
+                    { name: 'Bharath', email: 'bharath@example.com', role: 'Interviewer', status: 'active' }
+                ];
+                $log.info("User data loaded successfully.");
+            }, function(error) {
+                $log.error("Failed to load user data.");
             });
-        });
-    </script>
+
+        $scope.formatStatus = function(status) {
+            return StatusService.getFormattedStatus(status);
+        };
+
+        $scope.alert = function(action) {
+            $log.warn("Action triggered: " + action);
+            $scope.successMessage = `${action} clicked!`;
+            $timeout(function () {
+                $scope.successMessage = '';
+            }, 2000);
+        };
+    });
+</script>
+
 </body>
 </html>
