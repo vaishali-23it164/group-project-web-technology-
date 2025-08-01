@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HireSight</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -89,6 +90,23 @@
       font-weight: bold;
       color: #7e5bef;
     }
+
+    .fade.ng-enter, .fade.ng-leave {
+      transition: 0.5s linear all;
+      display: block;
+    }
+    .fade.ng-enter {
+      opacity: 0;
+    }
+    .fade.ng-enter-active {
+      opacity: 1;
+    }
+    .fade.ng-leave {
+      opacity: 1;
+    }
+    .fade.ng-leave-active {
+      opacity: 0;
+    }
   </style>
 </head>
 <body ng-controller="ResumeController">
@@ -96,8 +114,8 @@
   <header>
     <h1><strong>HireSight</strong></h1>
     <nav>
-      <a href="resumehome.html">Home</a>
-      <a href="resumeupload.html">Resume Suggester</a>
+      <a href="#">Home</a>
+      <a href="#">Resume Suggester</a>
     </nav>
   </header>
 
@@ -137,22 +155,22 @@
       <p>Enter your name:</p>
       <input type="text" ng-model="userName" placeholder="Type your name here..." />
       <div class="output">
-        Hello, <span ng-bind="userName"></span>! Your resume is almost ready.
+        Hello, <span ng-bind="userName | uppercase"></span>! Your resume is almost ready.
       </div>
     </div>
 
-  <div class="card" ng-controller="ResumeController">
-  <h2>Filter Skills</h2>
-  <input type="text" ng-model="searchSkill" placeholder="Search skills...">
-  <ul>
-    <li ng-repeat="skill in skills | filter:searchSkill">
-      <strong>{{ skill }}</strong>
+    <div class="card fade" ng-controller="ResumeController">
+      <h2>Filter Skills</h2>
+      <input type="text" ng-model="searchSkill" placeholder="Search skills...">
       <ul>
-        <li ng-repeat="tip in skillTips[skill]">{{ tip }}</li>
+        <li ng-repeat="skill in skills | filter:dynamicFilter | orderBy:'toString()'">
+          <strong my-highlight>{{ skill | lowercase }}</strong>
+          <ul>
+            <li ng-repeat="tip in skillTips[skill] | limitTo:3">{{ tip | shorten:100 }}</li>
+          </ul>
+        </li>
       </ul>
-    </li>
-  </ul>
-</div>
+    </div>
 
     <div class="card">
       <h2>About</h2>
@@ -194,41 +212,80 @@
   </script>
 
   <!-- AngularJS App & Controller -->
-<script>
-  angular.module("resumeApp", [])
-    .value("defaultSkills", ["HTML", "CSS", "JavaScript", "AngularJS", "Python"])
-    .controller("ResumeController", function($scope, defaultSkills) {
-      $scope.skills = defaultSkills;
+  <script>
+    angular.module("resumeApp", ['ngAnimate'])
+      .value("defaultSkills", ["HTML", "CSS", "JavaScript", "AngularJS", "Python"])
+      .factory("logger", function() {
+        return {
+          log: function(msg) { console.log("[LOG]:", msg); },
+          warn: function(msg) { console.warn("[WARN]:", msg); },
+          error: function(msg) { console.error("[ERROR]:", msg); }
+        };
+      })
+      .factory("dateFactory", function() {
+        return {
+          getToday: function() {
+            return new Date().toLocaleDateString();
+          }
+        };
+      })
+      .filter("shorten", function() {
+        return function(input, limit) {
+          if (!input) return '';
+          return input.length > limit ? input.substring(0, limit) + '...' : input;
+        };
+      })
+      .directive("myHighlight", function() {
+        return {
+          restrict: 'A',
+          link: function(scope, element) {
+            element.css("background-color", "#e0e0ff");
+          }
+        };
+      })
+      .controller("ResumeController", function($scope, defaultSkills, $timeout, $log, logger, dateFactory) {
+        $scope.userName = "";
+        $scope.searchSkill = "";
+        $scope.skills = defaultSkills;
+        $scope.today = dateFactory.getToday();
 
-      $scope.skillTips = {
-        "HTML": [
-          "Mention experience with semantic HTML elements.",
-          "Highlight projects where HTML was used to create responsive layouts.",
-          "Include knowledge of accessibility standards (e.g., ARIA)."
-        ],
-        "CSS": [
-          "Showcase CSS Flexbox and Grid knowledge.",
-          "Include work on responsive design and media queries.",
-          "Mention experience with preprocessors like SASS or LESS (if any)."
-        ],
-        "JavaScript": [
-          "Highlight DOM manipulation and ES6+ skills.",
-          "Mention interactive UI features you've built.",
-          "Add any JavaScript frameworks/libraries you’ve used."
-        ],
-        "AngularJS": [
-          "Include experience with directives and controllers.",
-          "Mention two-way data binding and dependency injection.",
-          "Showcase projects built using AngularJS."
-        ],
-        "Python": [
-          "Include Python scripts or automation tools you've developed.",
-          "Mention frameworks like Flask or Django (if used).",
-          "Highlight data analysis or ML experience if applicable."
-        ]
-      };
-    });
-</script>
+        $scope.skillTips = {
+          "HTML": [
+            "Mention experience with semantic HTML elements.",
+            "Highlight projects where HTML was used to create responsive layouts.",
+            "Include knowledge of accessibility standards (e.g., ARIA)."
+          ],
+          "CSS": [
+            "Showcase CSS Flexbox and Grid knowledge.",
+            "Include work on responsive design and media queries.",
+            "Mention experience with preprocessors like SASS or LESS (if any)."
+          ],
+          "JavaScript": [
+            "Highlight DOM manipulation and ES6+ skills.",
+            "Mention interactive UI features you've built.",
+            "Add any JavaScript frameworks/libraries you’ve used."
+          ],
+          "AngularJS": [
+            "Include experience with directives and controllers.",
+            "Mention two-way data binding and dependency injection.",
+            "Showcase projects built using AngularJS."
+          ],
+          "Python": [
+            "Include Python scripts or automation tools you've developed.",
+            "Mention frameworks like Flask or Django (if used).",
+            "Highlight data analysis or ML experience if applicable."
+          ]
+        };
 
+        $scope.dynamicFilter = function(skill) {
+          if (!$scope.searchSkill) return true;
+          return skill.toLowerCase().includes($scope.searchSkill.toLowerCase());
+        };
+
+        $timeout(function () {
+          logger.log("AngularJS app loaded on: " + $scope.today);
+        }, 500);
+      });
+  </script>
 </body>
 </html>
