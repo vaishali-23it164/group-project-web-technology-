@@ -1,673 +1,778 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="myApp">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HireSight Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HireSight Dashboard</title>
 
-  <!-- AngularJS & Chart.js -->
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- AngularJS & Chart.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Animation Styles -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Animation Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f0fb;
-      color: #333;
-    }
-    .header {
-      background: #a490f0;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      padding: 1rem 2rem;
-    }
-    .logo {
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-    .nav a {
-      margin-left: 1.5rem;
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .dashboard {
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-	  .slide-in.ng-enter {
-    animation: slideIn 0.6s ease-out;
-  }
-  @keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  .scale-up.ng-enter {
-    animation: scaleUp 0.5s;
-  }
-  @keyframes scaleUp {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  .rotate-in.ng-enter {
-    animation: rotateIn 0.7s ease-out;
-  }
-  @keyframes rotateIn {
-    from { transform: rotate(-90deg); opacity: 0; }
-    to { transform: rotate(0); opacity: 1; }
-  }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    .card {
-      background: linear-gradient(135deg, #e6ddfb, #d8c4f3);
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
-    }
-    .card:hover {
-      transform: translateY(-4px);
-    }
-    .card h4 {
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-      color: #5b3cc4;
-    }
-    .card p {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #3d2c8d;
-    }
-    .charts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    .chart-card {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-      height: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .chart-card h4 {
-      margin-bottom: 10px;
-      text-align: center;
-      color: #4b2991;
-    }
-    canvas {
-      max-height: 180px !important;
-    }
-    .filters {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-    .filters select {
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background-color: #ede9fe;
-      color: #4c1d95;
-      font-weight: 500;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    th, td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background: #f3e8ff;
-      color: #4b0082;
-    }
-    tr:hover {
-      background: #f0f4ff;
-    }
-
-    /* Animation for rows */
-    .fade-animate.ng-enter {
-      animation: fadeIn 0.8s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-  </style>
-</head>
-<body ng-controller="MainController">
-  <header class="header">
-    <div class="logo">HireSight</div>
-    <nav class="nav">
-      <a href="#">Dashboard</a>
-      <a href="#">Settings</a>
-      <a href="#">Logout</a>
-    </nav>
-  </header>
-
-  <main class="dashboard">
-
-    <!-- Applicant Status Summary -->
-    <div class="stats">
-      <div class="card"><h4>Total Applicants</h4><p>150</p></div>
-      <div class="card"><h4>Shortlisted</h4><p>45</p></div>
-      <div class="card"><h4>Interviewed</h4><p>75</p></div>
-      <div class="card"><h4>Pending</h4><p>12</p></div>
-      <div class="card"><h4>Rejected</h4><p>30</p></div>
-    </div>
-
-    <!-- Charts -->
-    <div class="charts">
-      <div class="chart-card">
-        <h4>Applicants by Job Status</h4>
-        <canvas id="barChart"></canvas>
-      </div>
-      <div class="chart-card">
-        <h4>Performance Distribution</h4>
-        <canvas id="pieChart"></canvas>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="card">
-      <div class="filters">
-        <select ng-model="selectedProject">
-          <option value="">-- Select Project --</option>
-          <option>Project Alpha</option>
-          <option>Project Beta</option>
-        </select>
-
-        <select ng-model="selectedFilterKey">
-          <option value="">-- Select --</option>
-          <option value="location">Location</option>
-          <option value="experience">Experience</option>
-        </select>
-
-        <input type="text" ng-model="searchTerm" placeholder="Enter value to search" />
-      </div>
-
-      <div style="padding: 0 1rem 1rem;">
-        <strong>Selected Project:</strong> {{ selectedProject }} <br/>
-<strong>Filter:</strong> {{ selectedFilterKey || 'None' }}
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ApplicantID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>AppliedDate</th>
-            <th>Status</th>
-            <th>Experience</th>
-            <th>Skills</th>
-            <th>Education</th>
-            <th>Portfolio</th>
-          </tr>
-        </thead>
-        <tbody>
-  <tr class="fade-animate" ng-repeat="applicant in applicants | filter:dynamicFilter">
-    <td>{{ applicant.id }}</td>
-    <td>{{ applicant.name | capitalize }}</td>
-    <td>{{ applicant.email }}</td>
-    <td>{{ applicant.phone }}</td>
-    <td>{{ applicant.date }}</td>
-    <td>{{ applicant.status }}</td>
-    <td>{{ applicant.experience }}</td>
-    <td>{{ applicant.skills }}</td>
-    <td>{{ applicant.qualification }}</td>
-    <td><a href="#">View</a></td>
-  </tr>
-</tbody>
-
-      </table>
-    </div>
-
-    <!-- Directive Example -->
-    <div ng-controller="StatusController" style="padding:1rem;">
-      <h4>Status List from Factory:</h4>
-      <ul>
-        <li ng-repeat="status in statusList">{{ status }}</li>
-      </ul>
-    </div>
-
-    <div style="padding:1rem;">
-      <applicant-card name="Meenakshi" email="meena@gmail.com"></applicant-card>
-      <applicant-card name="Vaishali" email="vaishu@gmail.com"></applicant-card>
-      <applicant-card name="Preethi" email="preethi@gmail.com"></applicant-card>
-    </div>
-
-  </main>
-
-  <script>
-    // Chart.js
-    new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: {
-        labels: ['Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager'],
-        datasets: [
-          { label: 'Eligible', data: [12, 19, 7, 5, 3], backgroundColor: '#a78bfa' },
-          { label: 'Not Eligible', data: [4, 6, 2, 3, 1], backgroundColor: '#c4b5fd' },
-          { label: 'Hired', data: [1, 2, 1, 1, 1], backgroundColor: '#8b5cf6' },
-          { label: 'Pending', data: [5, 8, 3, 2, 1], backgroundColor: '#ddd6fe' }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: { color: '#4b2991' }
-          }
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f0fb;
+            color: #333;
         }
-      }
-    });
 
-    new Chart(document.getElementById('pieChart'), {
-      type: 'pie',
-      data: {
-        labels: ['Excellent', 'Good', 'Average', 'Poor'],
-        datasets: [
-          { data: [40, 35, 15, 10], backgroundColor: ['#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe'] }
-        ]
-      },
-      options: { responsive: true }
-    });
-  </script>
-
- <!-- Angular App Logic -->
-<script>
-  angular.module('chartModule', []);
-  angular.module('myApp', ['chartModule', 'ngAnimate']);
-</script>
-
-<script>
-  angular.module('myApp')
-    .value('defaultUser', 'Alice Smith');
-
-  angular.module('myApp')
-    .service('ApplicantService', function() {
-      this.getApplicantCount = () => 150;
-    });
-
-  angular.module('myApp')
-    .factory('StatusFactory', function() {
-      return {
-        getStatuses: function() {
-          return ['Shortlisted', 'Interviewed', 'Rejected', 'Pending'];
+        .header {
+            background: #a490f0;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
         }
-      };
-    });
 
-  angular.module('myApp')
-    .directive('applicantCard', function() {
-      return {
-        restrict: 'E',
-        scope: {
-          name: '@',
-          email: '@'
-        },
-        template: `<div style="padding:10px;border:1px solid #d8b4fe;border-radius:8px;margin-bottom:8px;">
-                    <strong>{{ name }}</strong> - <em>{{ email }}</em>
-                   </div>`
-      };
-    });
-
-  angular.module('myApp')
-    .filter('capitalize', function() {
-      return function(input) {
-        if (!input) return '';
-        return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
-      };
-    });
-
-  // 🔹 Updated Controller with built-in injections
-  angular.module('myApp')
-    .controller('MainController', [
-      '$scope', 'defaultUser', '$timeout', '$log', '$http', 'ApplicantService', // 🔹 Added DI
-      function($scope, defaultUser, $timeout, $log, $http, ApplicantService) {
-
-        $scope.selectedProject = "Project Alpha";
-        $scope.selectedFilterKey = "experience";
-$scope.dynamicFilter = function(applicant) {
-  // Project filter
-  if ($scope.selectedProject && $scope.selectedProject !== 'Select Project') {
-    if (applicant.project !== $scope.selectedProject) return false;
-  }
-
-  // Additional filter (experience, location, etc.)
-  if ($scope.selectedFilterKey && $scope.searchTerm) {
-    const key = $scope.selectedFilterKey;
-    const value = $scope.searchTerm.toLowerCase();
-    if (!applicant[key] || applicant[key].toString().toLowerCase().indexOf(value) === -1) {
-      return false;
-    }
-  }
-
-  return true;
-};
-$scope.applicants = [
-  {
-    id: 1001,
-    name: 'Meenakshi',
-    email: 'meena@example.com',
-    phone: '+1234567890',
-    date: '2025-07-01',
-    status: 'Shortlisted',
-    experience: '3 yrs',
-    skills: 'HTML, CSS, JS',
-    qualification: 'B.Sc CS',
-    location: 'Chennai',
-    project: 'Project Alpha'
-  },
-  {
-    id: 1002,
-    name: 'Vaishali',
-    email: 'vaishu@example.com',
-    phone: '+0987654321',
-    date: '2025-07-05',
-    status: 'Interviewed',
-    experience: '5 yrs',
-    skills: 'React, Node.js',
-    qualification: 'MCA',
-    location: 'Bangalore',
-    project: 'Project Beta'
-  },
-  {
-    id: 1003,
-    name: 'Preethi',
-    email: 'preethi@example.com',
-    phone: '+0987654321',
-    date: '2025-07-10',
-    status: 'Interviewed',
-    experience: '4 yrs',
-    skills: 'React, Node.js',
-    qualification: 'MCA',
-    location: 'Theni',
-    project: 'Project Beta'
-  }
-];
-
-
-        // 🔹 Use $timeout to simulate delay in loading username
-        $timeout(function() {
-          $scope.userName = defaultUser;
-        }, 300);
-
-        // 🔹 Use $log to output applicant count from service
-        const count = ApplicantService.getApplicantCount();
-        $log.info("Total applicants (from ApplicantService):", count);
-
-        // 🔹 Placeholder $http usage for future API call
-        
-        $http.get('/api/applicants').then(function(response) {
-          console.log("Fetched applicants:", response.data);
-        }).catch(function(error) {
-          $log.error("Error fetching applicants:", error);
-        });
-     
-      }
-    ]);
-
-  angular.module('myApp')
-    .controller('StatusController', ['$scope', 'StatusFactory', function($scope, StatusFactory) {
-      $scope.statusList = StatusFactory.getStatuses();
-    }]);
-
-app.factory('UserFactory', function() {
-  return {
-    getUserRole: () => 'HR Manager'
-  };
-});
-
-app.factory('DateFormatterFactory', function() {
-  return {
-    format: (dateStr) => new Date(dateStr).toDateString()
-  };
-});
-
-app.factory('AuthFactory', function() {
-  return {
-    isLoggedIn: () => true,
-    getToken: () => 'abc123token'
-  };
-});
-
-app.factory('ColorFactory', function() {
-  return {
-    getStatusColor: (status) => {
-      const map = {
-        Interviewed: 'blue',
-        Rejected: 'red',
-        Pending: 'orange',
-        Shortlisted: 'green'
-      };
-      return map[status] || 'gray';
-    }
-  };
-});
-
-app.factory('LoggerFactory', function($log) {
-  return {
-    logInfo: (msg) => $log.info(`[INFO]: ${msg}`),
-    logError: (err) => $log.error(`[ERROR]: ${err}`)
-  };
-});
-
-
-app.filter('truncate', function() {
-  return function(input, length = 10) {
-    return input.length > length ? input.substring(0, length) + '...' : input;
-  };
-});
-
-app.filter('maskEmail', function() {
-  return function(email) {
-    return email.replace(/(.{2}).+(@.+)/, '$1****$2');
-  };
-});
-
-app.filter('capitalizeWords', function() {
-  return function(input) {
-    return input.replace(/\b\w/g, char => char.toUpperCase());
-  };
-});
-
-app.filter('reverse', function() {
-  return function(input) {
-    return input.split('').reverse().join('');
-  };
-});
-
-app.filter('daysSince', function() {
-  return function(dateStr) {
-    const today = new Date();
-    const date = new Date(dateStr);
-    const diff = Math.floor((today - date) / (1000 * 60 * 60 * 24));
-    return `${diff} day(s) ago`;
-  };
-});
-
-  </script>
-
-<script>
-  angular.module('chartModule', []);
-  angular.module('myApp', ['chartModule', 'ngAnimate']);
-</script>
-
-<script>
-  // Values and Services
-  angular.module('myApp')
-    .value('defaultUser', 'Alice Smith')
-    .service('ApplicantService', function() {
-      this.getApplicantCount = () => 150;
-    });
-
-  // Factories (5 examples)
-  angular.module('myApp')
-    .factory('StatusFactory', function() {
-      return {
-        getStatuses: () => ['Shortlisted', 'Interviewed', 'Rejected', 'Pending']
-      };
-    })
-    .factory('PositionFactory', function() {
-      return {
-        getRoles: () => ['Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager']
-      };
-    })
-    .factory('SkillFactory', function() {
-      return {
-        getSkills: () => ['HTML', 'CSS', 'JS', 'React', 'Node.js']
-      };
-    })
-    .factory('DateFormatFactory', ['$filter', function($filter) {
-      return {
-        format: (dateStr) => $filter('date')(dateStr, 'dd-MMM-yyyy')
-      };
-    }])
-    .factory('WindowFactory', ['$window', function($window) {
-      return {
-        alertUser: (msg) => $window.alert(msg)
-      };
-    }]);
-
-  // Directives (5 examples)
-  angular.module('myApp')
-    .directive('applicantCard', function() {
-      return {
-        restrict: 'E',
-        scope: {
-          name: '@',
-          email: '@'
-        },
-        template: `<div style="padding:10px;border:1px solid #d8b4fe;border-radius:8px;margin-bottom:8px;" hover-highlight>
-                    <strong>{{ name }}</strong> - <em>{{ email }}</em>
-                   </div>`
-      };
-    })
-    .directive('hoverHighlight', function() {
-      return {
-        restrict: 'A',
-        link: function(scope, elem) {
-          elem.on('mouseenter', () => elem.css('background', '#ede9fe'));
-          elem.on('mouseleave', () => elem.css('background', ''));
+        .logo {
+            font-weight: bold;
+            font-size: 1.5rem;
         }
-      };
-    })
-    .directive('formattedDate', ['DateFormatFactory', function(DateFormatFactory) {
-      return {
-        restrict: 'E',
-        scope: { date: '@' },
-        template: '<span>{{ formatted }}</span>',
-        link: function(scope) {
-          scope.formatted = DateFormatFactory.format(scope.date);
+
+        .nav a {
+            margin-left: 1.5rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
         }
-      };
-    }]);
 
-  // Filters (5 examples)
-  angular.module('myApp')
-    .filter('capitalize', function() {
-      return function(input) {
-        if (!input) return '';
-        return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
-      };
-    })
-    .filter('experienceLevel', function() {
-      return function(input) {
-        if (!input) return 'Unknown';
-        const years = parseInt(input);
-        if (years >= 5) return 'Expert';
-        if (years >= 3) return 'Intermediate';
-        return 'Beginner';
-      };
-    })
-    .filter('maskEmail', function() {
-      return function(email) {
-        if (!email) return '';
-        const parts = email.split('@');
-        return parts[0].charAt(0) + '***@' + parts[1];
-      };
-    });
+        .dashboard {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
 
-  // MainController
-  angular.module('myApp')
-    .controller('MainController', ['$scope', 'defaultUser', '$timeout', '$log', '$http', 'ApplicantService',
-      function($scope, defaultUser, $timeout, $log, $http, ApplicantService) {
+        .slide-in.ng-enter {
+            animation: slideIn 0.6s ease-out;
+        }
 
-        $scope.selectedProject = "Project Alpha";
-        $scope.selectedFilterKey = "experience";
-
-        $scope.dynamicFilter = function(applicant) {
-          if ($scope.selectedProject && $scope.selectedProject !== 'Select Project') {
-            if (applicant.project !== $scope.selectedProject) return false;
-          }
-          if ($scope.selectedFilterKey && $scope.searchTerm) {
-            const key = $scope.selectedFilterKey;
-            const value = $scope.searchTerm.toLowerCase();
-            if (!applicant[key] || applicant[key].toString().toLowerCase().indexOf(value) === -1) {
-              return false;
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
             }
-          }
-          return true;
-        };
 
-        $scope.applicants = [
-          { id: 1001, name: 'Meenakshi', email: 'meena@example.com', phone: '+1234567890', date: '2025-07-01',
-            status: 'Shortlisted', experience: '3', skills: 'HTML, CSS, JS', qualification: 'B.Sc CS',
-            location: 'Chennai', project: 'Project Alpha' },
-          { id: 1002, name: 'Vaishali', email: 'vaishu@example.com', phone: '+0987654321', date: '2025-07-05',
-            status: 'Interviewed', experience: '5', skills: 'React, Node.js', qualification: 'MCA',
-            location: 'Bangalore', project: 'Project Beta' },
-          { id: 1003, name: 'Preethi', email: 'preethi@example.com', phone: '+0987654321', date: '2025-07-10',
-            status: 'Interviewed', experience: '4', skills: 'React, Node.js', qualification: 'MCA',
-            location: 'Theni', project: 'Project Beta' }
-        ];
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
 
-        $timeout(function() {
-          $scope.userName = defaultUser;
-        }, 300);
+        .scale-up.ng-enter {
+            animation: scaleUp 0.5s;
+        }
 
-        const count = ApplicantService.getApplicantCount();
-        $log.info("Total applicants (from ApplicantService):", count);
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
 
-        $http.get('/api/applicants').then(function(response) {
-          console.log("Fetched applicants:", response.data);
-        }).catch(function(error) {
-          $log.error("Error fetching applicants:", error);
-        });
-      }
-    ]);
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
 
-  angular.module('myApp')
-    .controller('StatusController', ['$scope', 'StatusFactory', function($scope, StatusFactory) {
-      $scope.statusList = StatusFactory.getStatuses();
-    }]);
-</script>
+        .rotate-in.ng-enter {
+            animation: rotateIn 0.7s ease-out;
+        }
+
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-90deg);
+                opacity: 0;
+            }
+
+            to {
+                transform: rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #e6ddfb, #d8c4f3);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #5b3cc4;
+        }
+
+        .card p {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #3d2c8d;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .chart-card {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chart-card h4 {
+            margin-bottom: 10px;
+            text-align: center;
+            color: #4b2991;
+        }
+
+        canvas {
+            max-height: 180px !important;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .filters select {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #ede9fe;
+            color: #4c1d95;
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f3e8ff;
+            color: #4b0082;
+        }
+
+        tr:hover {
+            background: #f0f4ff;
+        }
+
+        /* Animation for rows */
+        .fade-animate.ng-enter {
+            animation: fadeIn 0.8s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body ng-controller="MainController">
+    <header class="header">
+        <div class="logo">HireSight</div>
+        <nav class="nav">
+            <a href="#">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+        </nav>
+    </header>
+
+    <main class="dashboard">
+
+        <!-- Applicant Status Summary -->
+        <div class="stats">
+            <div class="card">
+                <h4>Total Applicants</h4>
+                <p>150</p>
+            </div>
+            <div class="card">
+                <h4>Shortlisted</h4>
+                <p>45</p>
+            </div>
+            <div class="card">
+                <h4>Interviewed</h4>
+                <p>75</p>
+            </div>
+            <div class="card">
+                <h4>Pending</h4>
+                <p>12</p>
+            </div>
+            <div class="card">
+                <h4>Rejected</h4>
+                <p>30</p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+            <div class="chart-card">
+                <h4>Applicants by Job Status</h4>
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h4>Performance Distribution</h4>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <div class="filters">
+                <select ng-model="selectedProject">
+                    <option value="">-- Select Project --</option>
+                    <option>Project Alpha</option>
+                    <option>Project Beta</option>
+                </select>
+
+                <select ng-model="selectedFilterKey">
+                    <option value="">-- Select --</option>
+                    <option value="location">Location</option>
+                    <option value="experience">Experience</option>
+                </select>
+
+                <input type="text" ng-model="searchTerm" placeholder="Enter value to search" />
+            </div>
+
+            <div style="padding: 0 1rem 1rem;">
+                <strong>Selected Project:</strong> {{ selectedProject }} <br />
+                <strong>Filter:</strong> {{ selectedFilterKey || 'None' }}
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ApplicantID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>AppliedDate</th>
+                        <th>Status</th>
+                        <th>Experience</th>
+                        <th>Skills</th>
+                        <th>Education</th>
+                        <th>Portfolio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="fade-animate" ng-repeat="applicant in applicants | filter:dynamicFilter">
+                        <td>{{ applicant.id }}</td>
+                        <td>{{ applicant.name | capitalize }}</td>
+                        <td>{{ applicant.email }}</td>
+                        <td>{{ applicant.phone }}</td>
+                        <td>{{ applicant.date }}</td>
+                        <td>{{ applicant.status }}</td>
+                        <td>{{ applicant.experience }}</td>
+                        <td>{{ applicant.skills }}</td>
+                        <td>{{ applicant.qualification }}</td>
+                        <td><a href="#">View</a></td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- Directive Example -->
+        <div ng-controller="StatusController" style="padding:1rem;">
+            <h4>Status List from Factory:</h4>
+            <ul>
+                <li ng-repeat="status in statusList">{{ status }}</li>
+            </ul>
+        </div>
+
+        <div style="padding:1rem;">
+            <applicant-card name="Meenakshi" email="meena@gmail.com"></applicant-card>
+            <applicant-card name="Vaishali" email="vaishu@gmail.com"></applicant-card>
+            <applicant-card name="Preethi" email="preethi@gmail.com"></applicant-card>
+        </div>
+
+    </main>
+
+    <script>
+        // Chart.js
+        new Chart( document.getElementById( 'barChart' ), {
+            type: 'bar',
+            data: {
+                labels: [ 'Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager' ],
+                datasets: [
+                    { label: 'Eligible', data: [ 12, 19, 7, 5, 3 ], backgroundColor: '#a78bfa' },
+                    { label: 'Not Eligible', data: [ 4, 6, 2, 3, 1 ], backgroundColor: '#c4b5fd' },
+                    { label: 'Hired', data: [ 1, 2, 1, 1, 1 ], backgroundColor: '#8b5cf6' },
+                    { label: 'Pending', data: [ 5, 8, 3, 2, 1 ], backgroundColor: '#ddd6fe' }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#4b2991' }
+                    }
+                }
+            }
+        } );
+
+        new Chart( document.getElementById( 'pieChart' ), {
+            type: 'pie',
+            data: {
+                labels: [ 'Excellent', 'Good', 'Average', 'Poor' ],
+                datasets: [
+                    { data: [ 40, 35, 15, 10 ], backgroundColor: [ '#7c3aed', '#a78bfa', '#c4b5fd', '#ddd6fe' ] }
+                ]
+            },
+            options: { responsive: true }
+        } );
+    </script>
+
+    <!-- Angular App Logic -->
+    <script>
+        angular.module( 'chartModule', [] );
+        angular.module( 'myApp', [ 'chartModule', 'ngAnimate' ] );
+    </script>
+
+    <script>
+        angular.module( 'myApp' )
+            .value( 'defaultUser', 'Alice Smith' );
+
+        angular.module( 'myApp' )
+            .service( 'ApplicantService', function ()
+            {
+                this.getApplicantCount = () => 150;
+            } );
+
+        angular.module( 'myApp' )
+            .factory( 'StatusFactory', function ()
+            {
+                return {
+                    getStatuses: function ()
+                    {
+                        return [ 'Shortlisted', 'Interviewed', 'Rejected', 'Pending' ];
+                    }
+                };
+            } );
+
+        angular.module( 'myApp' )
+            .directive( 'applicantCard', function ()
+            {
+                return {
+                    restrict: 'E',
+                    scope: {
+                        name: '@',
+                        email: '@'
+                    },
+                    template: `<div style="padding:10px;border:1px solid #d8b4fe;border-radius:8px;margin-bottom:8px;">
+                    <strong>{{ name }}</strong> - <em>{{ email }}</em>
+                   </div>`
+                };
+            } );
+
+        angular.module( 'myApp' )
+            .filter( 'capitalize', function ()
+            {
+                return function ( input )
+                {
+                    if ( !input ) return '';
+                    return input.charAt( 0 ).toUpperCase() + input.slice( 1 ).toLowerCase();
+                };
+            } );
+
+        // 🔹 Updated Controller with built-in injections
+        angular.module( 'myApp' )
+            .controller( 'MainController', [
+                '$scope', 'defaultUser', '$timeout', '$log', '$http', 'ApplicantService', // 🔹 Added DI
+                function ( $scope, defaultUser, $timeout, $log, $http, ApplicantService )
+                {
+
+                    $scope.selectedProject = "Project Alpha";
+                    $scope.selectedFilterKey = "experience";
+                    $scope.userName = defaultUser;
+
+                    $scope.dynamicFilter = function ( applicant )
+                    {
+                        // Project filter
+                        if ( $scope.selectedProject && $scope.selectedProject !== 'Select Project' )
+                        {
+                            if ( applicant.project !== $scope.selectedProject ) return false;
+                        }
+
+                        // Additional filter (experience, location, etc.)
+                        if ( $scope.selectedFilterKey && $scope.searchTerm )
+                        {
+                            const key = $scope.selectedFilterKey;
+                            const value = $scope.searchTerm.toLowerCase();
+                            if ( !applicant[ key ] || applicant[ key ].toString().toLowerCase().indexOf( value ) === -1 )
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    };
+                    $scope.applicants = []; // start empty
+
+                    // Fetch applicants from backend
+                    $http.get( 'http://localhost:5000/api/applicants' )
+                        .then( function ( response )
+                        {
+                            $scope.applicants = response.data;   // <-- UPDATE scope here
+                            $log.info( "Fetched applicants:", response.data );
+                        } )
+                        .catch( function ( error )
+                        {
+                            $log.error( "Error fetching applicants:", error );
+                        } );
+
+                    // 🔹 Use $timeout to simulate delay in loading username
+                    $timeout( function ()
+                    {
+                        $scope.userName = defaultUser;
+                    }, 300 );
+
+                    // 🔹 Use $log to output applicant count from service
+                    const count = ApplicantService.getApplicantCount();
+                    $log.info( "Total applicants (from ApplicantService):", count );
+
+                    // 🔹 Placeholder $http usage for future API call
+
+                    $http.get( 'http://localhost:5000/api/applicants' )
+                        .then( function ( response )
+                        {
+                            $scope.applicants = response.data;
+                            console.log( "Fetched applicants:", response.data );
+                        } )
+                        .catch( function ( error )
+                        {
+                            $log.error( "Error fetching applicants:", error );
+                        } );
+
+
+                }
+            ] );
+
+        angular.module( 'myApp' )
+            .controller( 'StatusController', [ '$scope', 'StatusFactory', function ( $scope, StatusFactory )
+            {
+                $scope.statusList = StatusFactory.getStatuses();
+            } ] );
+
+        app.factory( 'UserFactory', function ()
+        {
+            return {
+                getUserRole: () => 'HR Manager'
+            };
+        } );
+
+        app.factory( 'DateFormatterFactory', function ()
+        {
+            return {
+                format: ( dateStr ) => new Date( dateStr ).toDateString()
+            };
+        } );
+
+        app.factory( 'AuthFactory', function ()
+        {
+            return {
+                isLoggedIn: () => true,
+                getToken: () => 'abc123token'
+            };
+        } );
+
+        app.factory( 'ColorFactory', function ()
+        {
+            return {
+                getStatusColor: ( status ) =>
+                {
+                    const map = {
+                        Interviewed: 'blue',
+                        Rejected: 'red',
+                        Pending: 'orange',
+                        Shortlisted: 'green'
+                    };
+                    return map[ status ] || 'gray';
+                }
+            };
+        } );
+
+        app.factory( 'LoggerFactory', function ( $log )
+        {
+            return {
+                logInfo: ( msg ) => $log.info( `[INFO]: ${msg}` ),
+                logError: ( err ) => $log.error( `[ERROR]: ${err}` )
+            };
+        } );
+
+
+        app.filter( 'truncate', function ()
+        {
+            return function ( input, length = 10 )
+            {
+                return input.length > length ? input.substring( 0, length ) + '...' : input;
+            };
+        } );
+
+        app.filter( 'maskEmail', function ()
+        {
+            return function ( email )
+            {
+                return email.replace( /(.{2}).+(@.+)/, '$1****$2' );
+            };
+        } );
+
+        app.filter( 'capitalizeWords', function ()
+        {
+            return function ( input )
+            {
+                return input.replace( /\b\w/g, char => char.toUpperCase() );
+            };
+        } );
+
+        app.filter( 'reverse', function ()
+        {
+            return function ( input )
+            {
+                return input.split( '' ).reverse().join( '' );
+            };
+        } );
+
+        app.filter( 'daysSince', function ()
+        {
+            return function ( dateStr )
+            {
+                const today = new Date();
+                const date = new Date( dateStr );
+                const diff = Math.floor( ( today - date ) / ( 1000 * 60 * 60 * 24 ) );
+                return `${diff} day(s) ago`;
+            };
+        } );
+
+    </script>
+
+    <script>
+        angular.module( 'chartModule', [] );
+        angular.module( 'myApp', [ 'chartModule', 'ngAnimate' ] );
+    </script>
+
+    <script>
+        // Values and Services
+        angular.module( 'myApp' )
+            .value( 'defaultUser', 'Alice Smith' )
+            .service( 'ApplicantService', function ()
+            {
+                this.getApplicantCount = () => 150;
+            } );
+
+        // Factories (5 examples)
+        angular.module( 'myApp' )
+            .factory( 'StatusFactory', function ()
+            {
+                return {
+                    getStatuses: () => [ 'Shortlisted', 'Interviewed', 'Rejected', 'Pending' ]
+                };
+            } )
+            .factory( 'PositionFactory', function ()
+            {
+                return {
+                    getRoles: () => [ 'Lead', 'Senior Dev', 'Junior Dev', 'QA', 'Manager' ]
+                };
+            } )
+            .factory( 'SkillFactory', function ()
+            {
+                return {
+                    getSkills: () => [ 'HTML', 'CSS', 'JS', 'React', 'Node.js' ]
+                };
+            } )
+            .factory( 'DateFormatFactory', [ '$filter', function ( $filter )
+            {
+                return {
+                    format: ( dateStr ) => $filter( 'date' )( dateStr, 'dd-MMM-yyyy' )
+                };
+            } ] )
+            .factory( 'WindowFactory', [ '$window', function ( $window )
+            {
+                return {
+                    alertUser: ( msg ) => $window.alert( msg )
+                };
+            } ] );
+
+        // Directives (5 examples)
+        angular.module( 'myApp' )
+            .directive( 'applicantCard', function ()
+            {
+                return {
+                    restrict: 'E',
+                    scope: {
+                        name: '@',
+                        email: '@'
+                    },
+                    template: `<div style="padding:10px;border:1px solid #d8b4fe;border-radius:8px;margin-bottom:8px;" hover-highlight>
+                    <strong>{{ name }}</strong> - <em>{{ email }}</em>
+                   </div>`
+                };
+            } )
+            .directive( 'hoverHighlight', function ()
+            {
+                return {
+                    restrict: 'A',
+                    link: function ( scope, elem )
+                    {
+                        elem.on( 'mouseenter', () => elem.css( 'background', '#ede9fe' ) );
+                        elem.on( 'mouseleave', () => elem.css( 'background', '' ) );
+                    }
+                };
+            } )
+            .directive( 'formattedDate', [ 'DateFormatFactory', function ( DateFormatFactory )
+            {
+                return {
+                    restrict: 'E',
+                    scope: { date: '@' },
+                    template: '<span>{{ formatted }}</span>',
+                    link: function ( scope )
+                    {
+                        scope.formatted = DateFormatFactory.format( scope.date );
+                    }
+                };
+            } ] );
+
+        // Filters (5 examples)
+        angular.module( 'myApp' )
+            .filter( 'capitalize', function ()
+            {
+                return function ( input )
+                {
+                    if ( !input ) return '';
+                    return input.charAt( 0 ).toUpperCase() + input.slice( 1 ).toLowerCase();
+                };
+            } )
+            .filter( 'experienceLevel', function ()
+            {
+                return function ( input )
+                {
+                    if ( !input ) return 'Unknown';
+                    const years = parseInt( input );
+                    if ( years >= 5 ) return 'Expert';
+                    if ( years >= 3 ) return 'Intermediate';
+                    return 'Beginner';
+                };
+            } )
+            .filter( 'maskEmail', function ()
+            {
+                return function ( email )
+                {
+                    if ( !email ) return '';
+                    const parts = email.split( '@' );
+                    return parts[ 0 ].charAt( 0 ) + '***@' + parts[ 1 ];
+                };
+            } );
+
+        // MainController
+        angular.module( 'myApp' )
+            .controller( 'MainController', [ '$scope', 'defaultUser', '$timeout', '$log', '$http', 'ApplicantService',
+                function ( $scope, defaultUser, $timeout, $log, $http, ApplicantService )
+                {
+
+                    $scope.selectedProject = "Project Alpha";
+                    $scope.selectedFilterKey = "experience";
+
+                    $scope.dynamicFilter = function ( applicant )
+                    {
+                        if ( $scope.selectedProject && $scope.selectedProject !== 'Select Project' )
+                        {
+                            if ( applicant.project !== $scope.selectedProject ) return false;
+                        }
+                        if ( $scope.selectedFilterKey && $scope.searchTerm )
+                        {
+                            const key = $scope.selectedFilterKey;
+                            const value = $scope.searchTerm.toLowerCase();
+                            if ( !applicant[ key ] || applicant[ key ].toString().toLowerCase().indexOf( value ) === -1 )
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    };
+
+                    $scope.applicants = []; // start empty
+
+                    $http.get( 'http://localhost:5000/api/applicants' )
+                        .then( function ( response )
+                        {
+                            $scope.applicants = response.data;   // now table updates from DB
+                            $log.info( "Fetched applicants:", response.data );
+                        } )
+                        .catch( function ( error )
+                        {
+                            $log.error( "Error fetching applicants:", error );
+                        } );
+
+
+                    $timeout( function ()
+                    {
+                        $scope.userName = defaultUser;
+                    }, 300 );
+
+                    const count = ApplicantService.getApplicantCount();
+                    $log.info( "Total applicants (from ApplicantService):", count );
+
+                    $http.get( '/api/applicants' ).then( function ( response )
+                    {
+                        console.log( "Fetched applicants:", response.data );
+                    } ).catch( function ( error )
+                    {
+                        $log.error( "Error fetching applicants:", error );
+                    } );
+                }
+            ] );
+
+        angular.module( 'myApp' )
+            .controller( 'StatusController', [ '$scope', 'StatusFactory', function ( $scope, StatusFactory )
+            {
+                $scope.statusList = StatusFactory.getStatuses();
+            } ] );
+    </script>
 
 </body>
+
 </html>
