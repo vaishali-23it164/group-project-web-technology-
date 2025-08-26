@@ -172,7 +172,7 @@
     <div class="bottom">
       <div class="card table-card">
         <h4>Ongoing Hiring Details</h4><br>
-        <table>
+        <table id="hiringTable">
           <thead>
             <tr>
               <th>Department</th>
@@ -206,56 +206,104 @@
     </div>
   </main>
   <script>
-    angular.module('hireSightApp.services', []);
-    angular.module('hireSightApp.directives', []);
-    angular.module('hireSightApp.controllers', []);
-    angular.module('hireSightApp.animations', ['ngAnimate']);
-    angular.module('hireSightApp', [
-      'hireSightApp.services',
-      'hireSightApp.directives',
-      'hireSightApp.controllers',
-      'hireSightApp.animations',
-      'ngAnimate'
-    ]);
-    angular.module('hireSightApp.services').factory('HiringStatsFactory', function () {
-      return {
-        getHiringStats: function () {
-          return { applied: 542, rejected: 112, selected: 185, pending: 245 };
+  angular.module('hireSightApp.services', []);
+  angular.module('hireSightApp.directives', []);
+  angular.module('hireSightApp.controllers', []);
+  angular.module('hireSightApp.animations', ['ngAnimate']);
+
+  angular.module('hireSightApp', [
+    'hireSightApp.services',
+    'hireSightApp.directives',
+    'hireSightApp.controllers',
+    'hireSightApp.animations',
+    'ngAnimate'
+  ]);
+
+  // --- Stats factory (still static for now) ---
+  angular.module('hireSightApp.services').factory('HiringStatsFactory', function () {
+    return {
+      getHiringStats: function () {
+        return { applied: 542, rejected: 112, selected: 185, pending: 245 };
+      }
+    };
+  });
+async function fetchHiringData() {
+  try {
+    const res = await fetch("http://localhost:5000/api/hiring");
+    const data = await res.json();
+    const tbody = document.querySelector("#hiringTable tbody");
+
+    tbody.innerHTML = ""; // Clear old rows
+    data.forEach(item => {
+      const row = `<tr>
+        <td>${item.Department}</td>
+        <td>${item.Position}</td>
+        <td>${item.Location}</td>
+        <td>${item.Total}</td>
+        <td>${item.Selected}</td>
+        <td>${item.Rejected}</td>
+        <td>${item.Pending}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+  } catch (err) {
+    console.error("Error fetching data:", err);
+  }
+}
+
+fetchHiringData();
+  // --- Service to fetch hiring details from backend ---
+  angular.module('hireSightApp.services').service('HiringDataService', function ($http) {
+    this.getHiringDetails = function () {
+      // returns a promise
+      return $http.get('http://localhost:5000/api/hiring')
+        .then(function (response) {
+          return response.data; // actual data from MongoDB
+        })
+        .catch(function (error) {
+          console.error('Error fetching hiring details:', error);
+          return []; // fallback
+        });
+    };
+  });
+
+  // --- Directive for highlight styling ---
+  angular.module('hireSightApp.directives').directive('highlightCard', function () {
+    return {
+      restrict: 'A',
+      link: function (scope, element, attrs) {
+        if (attrs.highlightCard === 'selected') {
+          element.css('border', '2px solid #4caf50');
+        } else if (attrs.highlightCard === 'rejected') {
+          element.css('border', '2px solid #f44336');
         }
-      };
-    });
-    angular.module('hireSightApp.services').service('HiringDataService', function () {
-      this.getHiringDetails = function () {
-        return [
-          { dept: "Engineering", pos: "Software Engineer", loc: "Chennai", total: 10, selected: 3, rejected: 4, pending: 3 },
-          { dept: "Human Resources", pos: "HR Recruiter", loc: "Bangalore", total: 8, selected: 2, rejected: 5, pending: 1 },
-          { dept: "Sales", pos: "Sales Executive", loc: "Mumbai", total: 12, selected: 5, rejected: 4, pending: 3 },
-          { dept: "Marketing", pos: "SEO Analyst", loc: "Delhi", total: 6, selected: 3, rejected: 3, pending: 0 }
-        ];
-      };
-    });
-    angular.module('hireSightApp.directives').directive('highlightCard', function () {
-      return {
-        restrict: 'A',
-        link: function (scope, element, attrs) {
-          if (attrs.highlightCard === 'selected') {
-            element.css('border', '2px solid #4caf50');
-          } else if (attrs.highlightCard === 'rejected') {
-            element.css('border', '2px solid #f44336');
-          }
-        }
-      };
-    });
-    angular.module('hireSightApp.controllers').controller('DashboardController', ['HiringStatsFactory', 'HiringDataService', function(HiringStatsFactory, HiringDataService) {
+      }
+    };
+  });
+
+  // --- Controller ---
+  angular.module('hireSightApp.controllers').controller('DashboardController',
+    ['HiringStatsFactory', 'HiringDataService',
+    function (HiringStatsFactory, HiringDataService) {
       const self = this;
-      self.hiringDetails = HiringDataService.getHiringDetails();
+
+      // Fetch Ongoing Hiring details from backend
+      HiringDataService.getHiringDetails().then(function (data) {
+        self.hiringDetails = data;
+
+        // Calculate ongoing/completed counts from DB data
+        self.ongoingCount = self.hiringDetails.filter(d => d.pending > 0).length;
+        self.completedCount = self.hiringDetails.filter(d => d.pending === 0).length;
+      });
+
+      // Static stats for top cards
       const stats = HiringStatsFactory.getHiringStats();
       self.applied = stats.applied;
       self.rejected = stats.rejected;
       self.selected = stats.selected;
       self.pending = stats.pending;
-      self.ongoingCount = self.hiringDetails.filter(d => d.pending > 0).length;
-      self.completedCount = self.hiringDetails.filter(d => d.pending === 0).length;
+
+      // Charts
       setTimeout(() => {
         const ctxLine = document.getElementById('lineChart').getContext('2d');
         new Chart(ctxLine, {
@@ -276,6 +324,7 @@
             scales: { y: { beginAtZero: true } }
           }
         });
+
         const ctxBar = document.getElementById('barChart').getContext('2d');
         new Chart(ctxBar, {
           type: 'bar',
@@ -294,7 +343,8 @@
           }
         });
       }, 100);
-    }]);
-  </script>
+  }]);
+</script>
+
 </body>
 </html>

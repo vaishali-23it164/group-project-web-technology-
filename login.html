@@ -231,57 +231,56 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
   <script>
     angular.module('hireSightApp', ['ngAnimate'])
-    .controller('LoginController', ['$scope', '$window', 'AuthService', function ($scope, $window, AuthService) {
-      $scope.user = { role: '', email: '', password: '' };
-      $scope.showLoginBox = true;
-      $scope.login = function () {
-        const match = AuthService.login($scope.user);
-        if (match) {
-          alert("Login successful!");
-          if (match.role === 'admin') {
-            $window.location.href = "adminhome.html";
-          } else if (match.role === 'jobseeker') {
-            $window.location.href = "resumehome.html";
-          } else {
-            $window.location.href = "hrdashboard.html";
-          }
+.controller('LoginController', ['$scope', '$window', 'AuthService', function ($scope, $window, AuthService) {
+  $scope.user = { role: '', email: '', password: '' };
+  $scope.showLoginBox = true;
+
+  $scope.login = function () {
+    AuthService.login($scope.user).then(function (res) {
+      if (res.success) {
+        alert("Login successful!");
+        if (res.role === 'admin') {
+          $window.location.href = "adminhome.html";
+        } else if (res.role === 'jobseeker') {
+          $window.location.href = "resumehome.html";
         } else {
-          alert("Invalid credentials");
+          $window.location.href = "hrdashboard.html";
         }
-      };
-    }])
-    .factory('AuthService', function () {
-      return {
-        login: function (user) {
-          const savedUsers = JSON.parse(localStorage.getItem("hiresight_users")) || [];
-          return savedUsers.find(u =>
-            u.email.toLowerCase() === user.email.toLowerCase() &&
-            u.password === user.password &&
-            u.role === user.role
-          );
-        }
-      };
-    })
-    .filter('capitalize', function () {
-      return function (input) {
-        return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-      };
-    })
-    .directive('emailChecker', function () {
-      return {
-        restrict: 'A',
-        
-        require: 'ngModel',
-        link: function (scope, element, attrs, ngModel) {
-          ngModel.$parsers.push(function (value) {
-            const savedUsers = JSON.parse(localStorage.getItem("hiresight_users")) || [];
-            const exists = savedUsers.some(u => u.email.toLowerCase() === value.toLowerCase());
-            ngModel.$setValidity('emailTaken', !exists);
-            return value;
-          });
-        }
-      };
+      } else {
+        alert("Invalid credentials");
+      }
+    }).catch(() => {
+      alert("Server error. Try again.");
     });
+  };
+}])
+.factory('AuthService', ['$http', function ($http) {
+  return {
+    login: function (user) {
+      return $http.post("http://localhost:5000/api/login", user)
+        .then(res => res.data);
+    }
+  };
+}])
+.filter('capitalize', function () {
+  return function (input) {
+    return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+  };
+})
+.directive('emailChecker', function () {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, ngModel) {
+      ngModel.$parsers.push(function (value) {
+        const savedUsers = JSON.parse(localStorage.getItem("hiresight_users")) || [];
+        const exists = savedUsers.some(u => u.email.toLowerCase() === value.toLowerCase());
+        ngModel.$setValidity('emailTaken', !exists);
+        return value;
+      });
+    }
+  };
+});
   </script>
 </body>
 </html>

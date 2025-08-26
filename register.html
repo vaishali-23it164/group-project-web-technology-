@@ -197,7 +197,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
 <script>
   angular.module('hireSightApp', ['ngAnimate'])
-    .controller('RegisterController', ['$scope', '$window', function($scope, $window) {
+.controller('RegisterController', ['$scope', '$window', '$http', function($scope, $window, $http) {
       $scope.user = {};
       $scope.errors = {};
       $scope.register = function () {
@@ -211,7 +211,7 @@
           $scope.errors.name = "Name must be at least 3 characters.";
           valid = false;
         }
-        const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test($scope.user.email || '')) {
           $scope.errors.email = "Enter a valid email.";
           valid = false;
@@ -231,16 +231,14 @@
           valid = false;
         }
         if (!valid) return;
-        const users = JSON.parse(localStorage.getItem("hiresight_users")) || [];
-        users.push({
-          role: $scope.user.role,
-          name: $scope.user.name,
-          email: $scope.user.email,
-          password: $scope.user.password
-        });
-        localStorage.setItem("hiresight_users", JSON.stringify(users));
-        alert("Registration successful! Please log in.");
-        $window.location.href = "login.html";
+        $http.post("http://localhost:5000/api/register", $scope.user)
+  .then(function(response) {
+    alert(response.data.message);
+    $window.location.href = "login.html";
+  })
+  .catch(function(error) {
+    alert(error.data.error || "Registration failed");
+  });
       };
     }])
     .filter('capitalize', function () {
