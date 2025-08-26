@@ -231,7 +231,7 @@
           valid = false;
         }
         if (!valid) return;
-        $http.post("http://localhost:5000/api/register", $scope.user)
+        $http.post("http://localhost:5001/api/register", $scope.user)
   .then(function(response) {
     alert(response.data.message);
     $window.location.href = "login.html";
