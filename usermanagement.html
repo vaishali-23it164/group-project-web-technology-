@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="hireSightApp" ng-controller="UserController as uc">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,7 +33,7 @@
             display: flex;
             justify-content: space-between;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .app-name {
@@ -64,7 +65,7 @@
             background: white;
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 900px;
         }
@@ -105,29 +106,29 @@
 
         .btn:hover {
             background-color: #dbe2f8;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .btn.primary {
             background-color: #a490f0;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .btn.primary:hover {
             background-color: #8f7ce0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .btn.deactivate {
             background-color: #ff6b6b;
             color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .btn.deactivate:hover {
             background-color: #ff4747;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .search-bar input {
@@ -204,6 +205,7 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="app-name">HireSight</div>
@@ -217,10 +219,12 @@
     <main class="container">
         <section class="card">
             <h2>User Management</h2>
-            <p>Create, edit, and manage user access for the HireSight platform. Assign roles, reset passwords, and manage accounts easily.</p>
-<div ng-if="successMessage" style="margin-bottom: 1rem; padding: 1rem; background: #d4edda; color: #155724; border-radius: 5px;">
-    {{ successMessage }}
-</div>
+            <p>Create, edit, and manage user access for the HireSight platform. Assign roles, reset passwords, and
+                manage accounts easily.</p>
+            <div ng-if="successMessage"
+                style="margin-bottom: 1rem; padding: 1rem; background: #d4edda; color: #155724; border-radius: 5px;">
+                {{ successMessage }}
+            </div>
 
             <div class="button-group">
                 <button class="btn primary" ng-click="alert('Add User')">Add User</button>
@@ -247,13 +251,11 @@
                         <td>{{ user.email }}</td>
                         <td>{{ user.role }}</td>
                         <td>
-                            <span
-                                ng-class="{
+                            <span ng-class="{
                                     'status-active': user.status === 'active',
                                     'status-deactivated': user.status === 'deactivated',
                                     'status-pending': user.status === 'pending'
-                                }"
-                                status-highlight="{{ user.status }}">
+                                }" status-highlight="{{ user.status }}">
                                 {{ formatStatus(user.status) }}
                             </span>
                         </td>
@@ -267,73 +269,92 @@
         © 2025 HireSight. All rights reserved.
     </footer>
 
-<script>
-    angular.module('hireSightApp', ['ngAnimate'])
+    <script>
+        angular.module( 'hireSightApp', [ 'ngAnimate' ] )
 
-    .service('StatusService', function () {
-        this.getFormattedStatus = function (status) {
-            return status.charAt(0).toUpperCase() + status.slice(1);
-        };
-    })
+            .service( 'StatusService', function ()
+            {
+                this.getFormattedStatus = function ( status )
+                {
+                    return status.charAt( 0 ).toUpperCase() + status.slice( 1 );
+                };
+            } )
 
-    .factory('RoleFactory', function () {
-        return {
-            roles: ['Admin', 'Recruiter', 'Job Seeker', 'Interviewer']
-        };
-    })
+            .factory( 'RoleFactory', function ()
+            {
+                return {
+                    roles: [ 'Admin', 'Recruiter', 'Job Seeker', 'Interviewer' ]
+                };
+            } )
 
-    .directive('statusHighlight', function () {
-        return {
-            restrict: 'A',
-            link: function (scope, element, attrs) {
-                if (attrs.statusHighlight.toLowerCase() === 'active') {
-                    element.css('font-weight', 'bold');
-                    element.css('color', '#28a745');
-                }
-            }
-        };
-    })
+            .directive( 'statusHighlight', function ()
+            {
+                return {
+                    restrict: 'A',
+                    link: function ( scope, element, attrs )
+                    {
+                        if ( attrs.statusHighlight.toLowerCase() === 'active' )
+                        {
+                            element.css( 'font-weight', 'bold' );
+                            element.css( 'color', '#28a745' );
+                        }
+                    }
+                };
+            } )
 
-    .filter('capitalize', function () {
-        return function (input) {
-            return input ? input.charAt(0).toUpperCase() + input.slice(1).toLowerCase() : '';
-        };
-    })
+            .filter( 'capitalize', function ()
+            {
+                return function ( input )
+                {
+                    return input ? input.charAt( 0 ).toUpperCase() + input.slice( 1 ).toLowerCase() : '';
+                };
+            } )
 
-    .controller('UserController', function ($scope, $http, $timeout, $log, StatusService, RoleFactory) {
-        $scope.users = [];
-        $scope.roles = RoleFactory.roles;
-        $scope.successMessage = "";
+            .controller( 'UserController', function ( $scope, $http, $timeout, $log, StatusService, RoleFactory )
+            {
+                $scope.users = [];
+                $scope.roles = RoleFactory.roles;
+                $scope.successMessage = "";
 
-        // Simulated $http GET call (you can replace with real API)
-        $http.get('https://jsonplaceholder.typicode.com/users') // Dummy API
-            .then(function(response) {
-                // Use dummy API to simulate some data
-                $scope.users = [
-                    { name: 'Vaishali', email: 'vaishali@example.com', role: 'Admin', status: 'active' },
-                    { name: 'Preethi', email: 'preethi@example.com', role: 'Recruiter', status: 'deactivated' },
-                    { name: 'Meenakshi', email: 'meenakshi@example.com', role: 'Job Seeker', status: 'active' },
-                    { name: 'Anand', email: 'anand@example.com', role: 'Job Seeker', status: 'pending' },
-                    { name: 'Bharath', email: 'bharath@example.com', role: 'Interviewer', status: 'active' }
-                ];
-                $log.info("User data loaded successfully.");
-            }, function(error) {
-                $log.error("Failed to load user data.");
-            });
+                // Try fetching from backend API
+                $http.get( 'http://localhost:5000/api/users' )
+                    .then( function ( response )
+                    {
+                        // Success → load users from MongoDB
+                        $scope.users = response.data;
+                        $log.info( "User data loaded successfully from MongoDB." );
+                    } )
+                    .catch( function ( error )
+                    {
+                        // Error → load dummy fallback data
+                        $log.error( "Failed to load user data. Using fallback data.", error );
+                        $scope.users = [
+                            { name: 'Vaishali', email: 'vaishali@example.com', role: 'Admin', status: 'active' },
+                            { name: 'Preethi', email: 'preethi@example.com', role: 'Recruiter', status: 'deactivated' },
+                            { name: 'Meenakshi', email: 'meenakshi@example.com', role: 'Job Seeker', status: 'active' },
+                            { name: 'Anand', email: 'anand@example.com', role: 'Job Seeker', status: 'pending' },
+                            { name: 'Bharath', email: 'bharath@example.com', role: 'Interviewer', status: 'active' }
+                        ];
+                    } );
 
-        $scope.formatStatus = function(status) {
-            return StatusService.getFormattedStatus(status);
-        };
+                $scope.formatStatus = function ( status )
+                {
+                    return StatusService.getFormattedStatus( status );
+                };
 
-        $scope.alert = function(action) {
-            $log.warn("Action triggered: " + action);
-            $scope.successMessage = `${action} clicked!`;
-            $timeout(function () {
-                $scope.successMessage = '';
-            }, 2000);
-        };
-    });
-</script>
+                $scope.alert = function ( action )
+                {
+                    $log.warn( "Action triggered: " + action );
+                    $scope.successMessage = `${action} clicked!`;
+                    $timeout( function ()
+                    {
+                        $scope.successMessage = '';
+                    }, 2000 );
+                };
+            } );
+    </script>
+
 
 </body>
+
 </html>
