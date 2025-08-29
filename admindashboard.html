@@ -145,7 +145,7 @@
     <div class="logo">HireSight</div>
     <nav class="nav">
       <a href="adminhome.html">Home</a>
-<a href="login.html">Logout</a>
+      <a href="login.html">Logout</a>
     </nav>
   </header>
   <main class="dashboard">
@@ -184,16 +184,8 @@
               <th>Pending</th>
             </tr>
           </thead>
-          <tbody>
-            <tr ng-repeat="row in dash.hiringDetails | limitTo:3 | orderBy:'dept'">
-              <td>{{row.dept | uppercase}}</td>
-              <td>{{row.pos}}</td>
-              <td>{{row.loc}}</td>
-              <td>{{row.total}}</td>
-              <td><span class="status-box status-selected" highlight-card="selected">{{row.selected}}</span></td>
-              <td><span class="status-box status-rejected" highlight-card="rejected">{{row.rejected}}</span></td>
-              <td><span class="status-box status-pending">{{row.pending}}</span></td>
-            </tr>
+          <tbody id="react-table-root">
+            <!-- React will render rows here -->
           </tbody>
         </table>
       </div>
@@ -205,6 +197,7 @@
       </div>
     </div>
   </main>
+
   <script>
   angular.module('hireSightApp.services', []);
   angular.module('hireSightApp.directives', []);
@@ -227,31 +220,7 @@
       }
     };
   });
-async function fetchHiringData() {
-  try {
-    const res = await fetch("http://localhost:5000/api/hiring");
-    const data = await res.json();
-    const tbody = document.querySelector("#hiringTable tbody");
 
-    tbody.innerHTML = ""; // Clear old rows
-    data.forEach(item => {
-      const row = `<tr>
-        <td>${item.Department}</td>
-        <td>${item.Position}</td>
-        <td>${item.Location}</td>
-        <td>${item.Total}</td>
-        <td>${item.Selected}</td>
-        <td>${item.Rejected}</td>
-        <td>${item.Pending}</td>
-      </tr>`;
-      tbody.innerHTML += row;
-    });
-  } catch (err) {
-    console.error("Error fetching data:", err);
-  }
-}
-
-fetchHiringData();
   // --- Service to fetch hiring details from backend ---
   angular.module('hireSightApp.services').service('HiringDataService', function ($http) {
     this.getHiringDetails = function () {
@@ -319,32 +288,66 @@ fetchHiringData();
               tension: 0.3
             }]
           },
-          options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true } }
-          }
+          options: { responsive: true, plugins: { legend: { display: true } } }
         });
 
         const ctxBar = document.getElementById('barChart').getContext('2d');
         new Chart(ctxBar, {
           type: 'bar',
           data: {
-            labels: ['Fresher (0-1 yrs)', 'Junior (1-3 yrs)', 'Mid (3-6 yrs)', 'Senior (6+ yrs)'],
+            labels: ['0-2 yrs', '3-5 yrs', '6-10 yrs', '10+ yrs'],
             datasets: [{
-              label: 'Number of Hires',
-              data: [25, 55, 70, 35],
-              backgroundColor: ['#bfa4ff', '#a48ef0', '#8661f2', '#b0b6d1']
+              label: 'Hires',
+              data: [15, 35, 45, 20],
+              backgroundColor: ['#9fa8da', '#7986cb', '#5c6bc0', '#3f51b5']
             }]
           },
-          options: {
-            responsive: true,
-            indexAxis: 'y',
-            scales: { x: { beginAtZero: true } }
-          }
+          options: { responsive: true, plugins: { legend: { display: false } } }
         });
       }, 100);
-  }]);
-</script>
+    }]);
+  </script>
 
+  <!-- React and ReactDOM for the table -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+
+  <script type="text/javascript">
+    const e = React.createElement;
+
+    // React component to render the Hiring Table rows
+    function HiringTable() {
+      const [data, setData] = React.useState([]);
+
+      React.useEffect(() => {
+        fetch('http://localhost:5000/api/hiring')
+          .then(res => res.json())
+          .then(json => {
+            // Sort by Department and limit to 3 rows
+            const sorted = json.sort((a, b) => a.Department.localeCompare(b.Department));
+            setData(sorted);
+          })
+          .catch(err => console.error('Error fetching hiring data:', err));
+      }, []);
+
+      return e(
+        React.Fragment,
+        null,
+        data.map((row, idx) =>
+          e('tr', { key: idx },
+            e('td', null, row.Department.toUpperCase()),
+            e('td', null, row.Position),
+            e('td', null, row.Location),
+            e('td', null, row.Total),
+            e('td', null, row.Selected),
+            e('td', null, row.Rejected),
+            e('td', null, row.Pending)
+          )
+        )
+      );
+    }
+    const root = document.getElementById('react-table-root');
+ReactDOM.createRoot(root).render(e(HiringTable));
+  </script>
 </body>
 </html>
